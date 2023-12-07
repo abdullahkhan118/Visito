@@ -10,7 +10,7 @@ class EventsViewModel : ViewModel() {
     var allEvents = true
     var events = MutableLiveData<ArrayList<EventModel>>()
     fun fetchEvents(): MutableLiveData<ArrayList<EventModel>> {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+        if (repository == null) repository = HomeRepository.instance
         events = repository!!.fetchEvents()
         return events
     }

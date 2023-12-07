@@ -21,7 +21,7 @@ class AccountViewModel : ViewModel() {
         Log.e("UpdatedPassword", password!!)
         Log.e("UpdatedPhoneNumber", phoneNumber!!)
         userModel = UserModel(
-            userModel.getId(),
+            userModel!!.id,
             email,
             name,
             password,

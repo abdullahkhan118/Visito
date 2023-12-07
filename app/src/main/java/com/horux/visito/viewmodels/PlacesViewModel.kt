@@ -10,7 +10,7 @@ class PlacesViewModel : ViewModel() {
     var popularSelected = true
     var places = MutableLiveData<ArrayList<PlaceModel>>()
     fun fetchPlaces(): MutableLiveData<ArrayList<PlaceModel>> {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+        if (repository == null) repository = HomeRepository.instance
         places = repository!!.fetchPlaces()
         return places
     }

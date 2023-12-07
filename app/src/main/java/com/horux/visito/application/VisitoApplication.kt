@@ -1,6 +1,10 @@
 package com.horux.visito.application
 
+import android.content.pm.PackageManager
 import com.facebook.FacebookSdk
+import com.facebook.appevents.AppEventsLogger
+import com.horux.visito.R
+
 class VisitoApplication : android.app.Application() {
     override fun onCreate() {
         super.onCreate()

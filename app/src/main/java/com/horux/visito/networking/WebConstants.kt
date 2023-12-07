@@ -1,6 +1,9 @@
 package com.horux.visito.networking
 
-import com.horux.visito.BuildConfig
+import com.google.gson.Gson
+import okhttp3.OkHttpClient
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
 import java.security.cert.X509Certificate
 import javax.net.ssl.SSLException
 import javax.net.ssl.SSLSocketFactory
@@ -40,9 +43,9 @@ object WebConstants {
     val retrofitInstance: Retrofit?
         get() {
             if (retrofit != null) return retrofit
-            val builder: OkHttpClient.Builder = Builder()
+            val builder: OkHttpClient.Builder = OkHttpClient.Builder()
             val gson = Gson()
-            retrofit = Builder()
+            retrofit = Retrofit.Builder()
                 .baseUrl(STRING_TOM_TOM_BASE_URL)
                 .client(buildClient(builder))
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -54,9 +57,9 @@ object WebConstants {
             if (retrofitTomTom != null) {
                 return retrofitTomTom
             }
-            val builder: OkHttpClient.Builder = Builder()
+            val builder: OkHttpClient.Builder = OkHttpClient.Builder()
             val gson = Gson()
-            retrofitTomTom = Builder()
+            retrofitTomTom = Retrofit.Builder()
                 .baseUrl(STRING_TOM_TOM_BASE_URL)
                 .client(buildClient(builder))
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -68,9 +71,9 @@ object WebConstants {
             if (retrofitWeather != null) {
                 return retrofitWeather
             }
-            val builder: OkHttpClient.Builder = Builder()
+            val builder: OkHttpClient.Builder = OkHttpClient.Builder()
             val gson = Gson()
-            retrofitWeather = Builder()
+            retrofitWeather = Retrofit.Builder()
                 .baseUrl(STRING_WEATHER_BASE_URL)
                 .client(buildClient(builder))
                 .addConverterFactory(GsonConverterFactory.create(gson))
@@ -97,7 +100,7 @@ object WebConstants {
                 }
 
                 override fun getAcceptedIssuers(): Array<X509Certificate> {
-                    return arrayOf(certificate.cert())
+                    return arrayOf(certificate.cert()!!)
                 }
             }
             builder.sslSocketFactory(
@@ -120,5 +123,5 @@ object WebConstants {
         java.security.cert.CertificateException::class
     )
     val certificate: SelfSignedCertificate
-        get() = SelfSignedCertificate(BuildConfig.APPLICATION_ID)
+        get() = SelfSignedCertificate(com.horux.visito.BuildConfig.APPLICATION_ID)
 }

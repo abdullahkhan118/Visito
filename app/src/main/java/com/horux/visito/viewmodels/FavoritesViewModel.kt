@@ -10,18 +10,16 @@ import com.horux.visito.repositories.HomeRepository
 class FavoritesViewModel : ViewModel() {
     var repository: HomeRepository? = null
     var favorites = MutableLiveData<ArrayList<PlaceModel>?>()
-    fun fetchFavorites(viewLifecycleOwner: LifecycleOwner?): MutableLiveData<ArrayList<PlaceModel>?> {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+    fun fetchFavorites(viewLifecycleOwner: LifecycleOwner): MutableLiveData<ArrayList<PlaceModel>?> {
+        if (repository == null) repository = HomeRepository.instance
         repository!!.fetchFavorites()
-            .observe(viewLifecycleOwner, object : Observer<ArrayList<PlaceModel?>?> {
-                override fun onChanged(placeModels: ArrayList<PlaceModel>) {
-                    if (!placeModels.isEmpty() || favorites.value == null) {
-                        favorites.setValue(placeModels)
-                    } else {
-                        favorites.setValue(favorites.value)
-                    }
+            .observe(viewLifecycleOwner!!) { placeModels ->
+                if (!placeModels.isEmpty() || favorites.value == null) {
+                    favorites.setValue(placeModels)
+                } else {
+                    favorites.setValue(favorites.value)
                 }
-            })
+            }
         return favorites
     }
 }

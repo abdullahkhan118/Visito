@@ -3,28 +3,43 @@ package com.horux.visito.operations.business_logic
 import android.Manifest
 import android.app.Activity
 import android.content.Context
+import android.content.IntentSender
+import android.content.pm.PackageManager
 import android.location.Location
 import android.util.Log
+import androidx.core.app.ActivityCompat
+import androidx.lifecycle.MutableLiveData
 import com.google.android.gms.common.api.ResolvableApiException
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationAvailability
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.LocationSettingsRequest
+import com.google.android.gms.location.LocationSettingsResponse
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
+import com.google.android.gms.tasks.Task
 
 class FusedLocation private constructor() {
-    var currentLocation: MutableLiveData<Location> = MutableLiveData<Any?>()
+    var currentLocation: MutableLiveData<Location> = MutableLiveData()
     var request: LocationRequest = LocationRequest
         .create()
         .setInterval(10000)
         .setFastestInterval(5000)
         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY)
     var locationCallback: LocationCallback = object : LocationCallback() {
-        fun onLocationResult(locationResult: LocationResult) {
+        override fun onLocationResult(locationResult: LocationResult) {
             super.onLocationResult(locationResult)
-            val location: Location = locationResult.getLocations().get(0)
+            val location: Location? = locationResult.locations.firstOrNull()
             Log.e("LocationUpdate", location.toString())
             if (location != null) {
                 currentLocation.setValue(location)
             }
         }
 
-        fun onLocationAvailability(locationAvailability: LocationAvailability) {
+        override fun onLocationAvailability(locationAvailability: LocationAvailability) {
             super.onLocationAvailability(locationAvailability)
         }
     }
@@ -49,9 +64,9 @@ class FusedLocation private constructor() {
         ) {
             return
         }
-        fusedLocationClient.getLastLocation()
-            .addOnSuccessListener(object : OnSuccessListener<Location?>() {
-                fun onSuccess(location: Location?) {
+        fusedLocationClient?.getLastLocation()
+            ?.addOnSuccessListener(object : OnSuccessListener<Location?> {
+                override fun onSuccess(location: Location?) {
                     if (location != null) {
                         currentLocation.setValue(location)
                     }
@@ -62,9 +77,9 @@ class FusedLocation private constructor() {
     fun startLocationUpdates(activity: Activity) {
         createClient(activity.baseContext)
         task = LocationServices.getSettingsClient(activity)
-            .checkLocationSettings(Builder().addLocationRequest(request).build())
-        task.addOnSuccessListener(object : OnSuccessListener<LocationSettingsResponse?>() {
-            fun onSuccess(locationSettingsResponse: LocationSettingsResponse?) {
+            .checkLocationSettings(LocationSettingsRequest.Builder().addLocationRequest(request).build())
+        task?.addOnSuccessListener(object : OnSuccessListener<LocationSettingsResponse?> {
+            override fun onSuccess(locationSettingsResponse: LocationSettingsResponse?) {
                 if (ActivityCompat.checkSelfPermission(
                         activity,
                         Manifest.permission.ACCESS_FINE_LOCATION
@@ -78,7 +93,7 @@ class FusedLocation private constructor() {
                     return
                 }
                 Log.e("RequestingLocation", "True")
-                fusedLocationClient.requestLocationUpdates(
+                fusedLocationClient?.requestLocationUpdates(
                     request,
                     locationCallback,
                     activity.mainLooper
@@ -86,15 +101,15 @@ class FusedLocation private constructor() {
                 return
             }
         })
-        task.addOnFailureListener(object : OnFailureListener() {
-            fun onFailure(exception: Exception) {
+        task?.addOnFailureListener(object : OnFailureListener {
+            override fun onFailure(exception: Exception) {
                 if (exception is ResolvableApiException) {
                     try {
                         (exception as ResolvableApiException).startResolutionForResult(
                             activity,
                             REQUEST_CHECK_SETTINGS
                         )
-                    } catch (e: SendIntentException) {
+                    } catch (e: IntentSender.SendIntentException) {
                         e.printStackTrace()
                     }
                 }
@@ -103,15 +118,15 @@ class FusedLocation private constructor() {
     }
 
     fun stopLocationUpdates() {
-        if (fusedLocationClient != null) fusedLocationClient.removeLocationUpdates(locationCallback)
+        fusedLocationClient?.removeLocationUpdates(locationCallback)
     }
 
     companion object {
         private var fusedLocation: FusedLocation? = null
-        val instance: FusedLocation?
+        val instance: FusedLocation
             get() {
                 if (fusedLocation == null) fusedLocation = FusedLocation()
-                return fusedLocation
+                return fusedLocation!!
             }
     }
 }

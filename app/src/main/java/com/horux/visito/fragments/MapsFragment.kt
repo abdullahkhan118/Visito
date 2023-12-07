@@ -1,16 +1,46 @@
 package com.horux.visito.fragments
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
+import android.content.pm.PackageManager
 import android.hardware.Sensor
+import android.hardware.SensorEvent
+import android.hardware.SensorEventListener
+import android.hardware.SensorManager
 import android.location.Location
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.model.CameraPosition
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.Marker
+import com.google.android.gms.maps.model.MarkerOptions
+import com.horux.visito.R
+import com.horux.visito.activities.HomeActivity
+import com.horux.visito.activities.PermissionActivity
+import com.horux.visito.adapters.AddressAdapter
+import com.horux.visito.databinding.FragmentMapsBinding
+import com.horux.visito.globals.AppConstants
+import com.horux.visito.models.dao.EventModel
+import com.horux.visito.models.dao.PlaceModel
 import com.horux.visito.models.tomtom.autocomplete.Result
+import com.horux.visito.models.tomtom.route.RouteResponse
+import com.horux.visito.operations.ui_operations.DialogPrompt
+import com.horux.visito.viewmodels.MapViewModel
 import java.util.Arrays
 import java.util.Locale
 import java.util.function.Predicate
@@ -22,27 +52,27 @@ class MapsFragment : Fragment(), SensorEventListener {
     var haveSensor2 = false
     var rMat = FloatArray(9)
     var orientation = FloatArray(3)
-    private var permissionActivity: PermissionActivity? = null
-    private var binding: FragmentMapsBinding? = null
-    private var googleMap: GoogleMap? = null
-    private var currentLocationMarker: Marker? = null
-    private var destinationMarker: Marker? = null
+    private lateinit var permissionActivity: PermissionActivity
+    private lateinit var binding: FragmentMapsBinding
+    private lateinit var googleMap: GoogleMap
+    private lateinit var currentLocationMarker: Marker
+    private lateinit var destinationMarker: Marker
 
     //    private Polyline polyline;
-    private var cameraPositionBuilder: CameraPosition.Builder? = null
-    private var viewModel: MapViewModel? = null
-    private var addressAdapter: AddressAdapter? = null
+    private lateinit var cameraPositionBuilder: CameraPosition.Builder
+    private lateinit var viewModel: MapViewModel
+    private lateinit var addressAdapter: AddressAdapter
     private val categories = ArrayList<String>()
     private val radiuses = ArrayList<String>()
-    private var mSensorManager: SensorManager? = null
-    private var mRotationV: Sensor? = null
-    private var mAccelerometer: Sensor? = null
-    private var mMagnetometer: Sensor? = null
+    private lateinit var mSensorManager: SensorManager
+    private lateinit var mRotationV: Sensor
+    private lateinit var mAccelerometer: Sensor
+    private lateinit var mMagnetometer: Sensor
     private val mLastAccelerometer = FloatArray(3)
     private val mLastMagnetometer = FloatArray(3)
     private var mLastAccelerometerSet = false
     private var mLastMagnetometerSet = false
-    fun onCreateView(
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,12 +84,12 @@ class MapsFragment : Fragment(), SensorEventListener {
         return binding.getRoot()
     }
 
-    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.map.onCreate(savedInstanceState)
-        permissionActivity = requireActivity() as PermissionActivity?
-        categories.addAll(Arrays.asList(getResources().getStringArray(R.array.categories)))
-        radiuses.addAll(Arrays.asList(getResources().getStringArray(R.array.radius)))
+        permissionActivity = requireActivity() as PermissionActivity
+        categories.addAll(getResources().getStringArray(R.array.categories).toList())
+        radiuses.addAll(getResources().getStringArray(R.array.radius).toList())
         mSensorManager =
             permissionActivity.getSystemService(Context.SENSOR_SERVICE) as SensorManager
         setAdapters()
@@ -68,7 +98,7 @@ class MapsFragment : Fragment(), SensorEventListener {
 
     private fun setAdapters() {
         binding.category.setAdapter(
-            ArrayAdapter<Any?>(
+            ArrayAdapter(
                 permissionActivity,
                 R.layout.row_spinner,
                 R.id.chosen_value,
@@ -77,7 +107,7 @@ class MapsFragment : Fragment(), SensorEventListener {
         )
         binding.category.setText(categories[categories.size - 1], false)
         binding.radius.setAdapter(
-            ArrayAdapter<Any?>(
+            ArrayAdapter(
                 permissionActivity,
                 R.layout.row_spinner,
                 R.id.chosen_value,
@@ -87,30 +117,27 @@ class MapsFragment : Fragment(), SensorEventListener {
         binding.radius.setText(radiuses[radiuses.size - 1], false)
     }
 
-    fun onStart() {
+    override fun onStart() {
         super.onStart()
-        if (permissionActivity == null) permissionActivity = requireActivity() as HomeActivity?
+        permissionActivity = requireActivity() as HomeActivity
         binding.map.onStart()
         permissionActivity.startLocationUpdates()
         viewModel.autoComplete.observe(
             getViewLifecycleOwner(),
-            Observer<Any?> { autoCompleteResponse ->
-                if (autoCompleteResponse != null && autoCompleteResponse.getResults() != null) {
-                    Log.e("Result", autoCompleteResponse.getResults().toString())
+            Observer { autoCompleteResponse ->
+                if (autoCompleteResponse != null && autoCompleteResponse.results != null) {
+                    Log.e("Result", autoCompleteResponse.results.toString())
                     val addresses = ArrayList<Result>()
                     val categoryString: String = binding.category.getText().toString().toLowerCase()
                     Log.e("CategoryString", categoryString)
-                    val results: List<Result> = autoCompleteResponse.getResults().stream().filter(
-                        Predicate<Result> { result ->
-                            result.poi.categories.stream().anyMatch { s ->
-                                s.lowercase(
-                                    Locale.getDefault()
-                                ) == categoryString
-                            }
-                        }).collect<List<Result>, Any>(
-                        Collectors.toList<Result>()
-                    )
-                    if (results.isEmpty()) addresses.addAll(autoCompleteResponse.getResults()) else addresses.addAll(
+                    val results: List<Result> = autoCompleteResponse.results!!.filter {
+                        it.poi!!.categories!!.stream().anyMatch { s ->
+                            s!!.lowercase(
+                                Locale.getDefault()
+                            ) == categoryString
+                        }
+                    }
+                    if (results.isEmpty()) addresses.addAll(autoCompleteResponse.results!!) else addresses.addAll(
                         results
                     )
                     Log.e("Addresses", Arrays.toString(addresses.toTypedArray()))
@@ -121,64 +148,61 @@ class MapsFragment : Fragment(), SensorEventListener {
             })
         viewModel.weather.observe(
             getViewLifecycleOwner(),
-            Observer<Any?> { currentWeatherResponse ->
+            Observer { currentWeatherResponse ->
                 if (currentWeatherResponse != null) {
                     binding.weatherCard.setVisibility(View.VISIBLE)
                     binding.weatherCondition.setText(
-                        currentWeatherResponse.getCurrent().getCondition().getText()
+                        currentWeatherResponse.current!!.condition!!.text
                     )
                     binding.temperature.setText(
-                        currentWeatherResponse.getCurrent().getTempC().toString() + " \u2103"
+                        currentWeatherResponse.current!!.tempC.toString() + " \u2103"
                     )
                 } else {
                     binding.weatherCard.setVisibility(View.GONE)
                 }
             })
-        binding.map.getMapAsync(object : OnMapReadyCallback() {
-            fun onMapReady(googleMap: GoogleMap) {
+        binding.map.getMapAsync(object : OnMapReadyCallback {
+            override fun onMapReady(googleMap: GoogleMap) {
                 this@MapsFragment.googleMap = googleMap
                 setMapUi()
-                cameraPositionBuilder = Builder()
+                cameraPositionBuilder = CameraPosition.Builder()
                 val location: Location = permissionActivity.fusedLocation.currentLocation.getValue()
-                val latLngBoundsBuilder: LatLngBounds.Builder = Builder()
+                val latLngBoundsBuilder: LatLngBounds.Builder = LatLngBounds.Builder()
                 if (location != null) {
                     val currentPosition = LatLng(location.latitude, location.longitude)
                     if (currentLocationMarker == null) currentLocationMarker =
-                        googleMap.addMarker(MarkerOptions().position(currentPosition)) else currentLocationMarker.setPosition(
+                        googleMap.addMarker(MarkerOptions().position(currentPosition))!! else currentLocationMarker.setPosition(
                         currentPosition
                     )
                     googleMap.animateCamera(
                         CameraUpdateFactory.newCameraPosition(
-                            Builder().target(
+                            CameraPosition.Builder().target(
                                 currentPosition
-                            ).zoom(16).build()
+                            ).zoom(16f).build()
                         )
                     )
                     var destinationPosition: LatLng? = null
                     if (getArguments() != null) {
-                        val type: String = getArguments().getString(AppConstants.STRING_TYPE)
+                        val type: String = requireArguments().getString(AppConstants.STRING_TYPE)!!
                         if (type != null) {
                             if (type == AppConstants.STRING_PLACES) {
                                 val place: PlaceModel =
-                                    getArguments().getParcelable(AppConstants.STRING_DATA)
+                                    requireArguments().getParcelable(AppConstants.STRING_DATA)!!
                                 if (place != null) {
                                     destinationPosition =
-                                        LatLng(place.getLatitude(), place.getLongitude())
+                                        LatLng(place.latitude, place.longitude)
                                 }
                             } else {
                                 val event: EventModel =
-                                    getArguments().getParcelable(AppConstants.STRING_DATA)
+                                    requireArguments().getParcelable(AppConstants.STRING_DATA)!!
                                 if (event != null) {
                                     destinationPosition =
-                                        LatLng(event.getLatitude(), event.getLongitude())
+                                        LatLng(event.latitude, event.longitude)
                                 }
                             }
-                            if (destinationPosition != null) {
-                                if (destinationMarker == null) destinationMarker =
-                                    googleMap.addMarker(MarkerOptions().position(destinationPosition)) else destinationMarker.setPosition(
-                                    destinationPosition
-                                )
-                            }
+                            destinationMarker.setPosition(
+                            destinationPosition!!
+                        )
                         }
                     }
                     if (currentPosition != null || destinationPosition != null) {
@@ -201,16 +225,16 @@ class MapsFragment : Fragment(), SensorEventListener {
         })
         permissionActivity.fusedLocation.currentLocation.observe(
             getViewLifecycleOwner(),
-            object : Observer<Location?> {
+            object : Observer<Location> {
                 override fun onChanged(location: Location) {
                     viewModel.currentLocation = location
                     if (googleMap != null) {
                         val currentPosition = LatLng(location.latitude, location.longitude)
                         if (currentLocationMarker == null) {
                             currentLocationMarker =
-                                googleMap.addMarker(MarkerOptions().position(currentPosition))
+                                googleMap.addMarker(MarkerOptions().position(currentPosition))!!
                             cameraPositionBuilder.target(currentLocationMarker.getPosition())
-                            cameraPositionBuilder.zoom(16)
+                            cameraPositionBuilder.zoom(16f)
                             googleMap.animateCamera(
                                 CameraUpdateFactory.newCameraPosition(
                                     cameraPositionBuilder.build()
@@ -229,22 +253,20 @@ class MapsFragment : Fragment(), SensorEventListener {
     private fun setMapUi() {
         if (googleMap != null) {
             googleMap.getUiSettings().setCompassEnabled(true)
-            if (ActivityCompat.checkSelfPermission(
-                    permissionActivity,
+            if (permissionActivity.checkSelfPermission(
                     Manifest.permission.ACCESS_FINE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
-                && ActivityCompat.checkSelfPermission(
-                    permissionActivity,
+                && permissionActivity.checkSelfPermission(
                     Manifest.permission.ACCESS_COARSE_LOCATION
                 ) == PackageManager.PERMISSION_GRANTED
             ) {
                 googleMap.setMyLocationEnabled(true)
                 googleMap.getUiSettings().setMyLocationButtonEnabled(true)
                 googleMap.setOnMyLocationButtonClickListener(object :
-                    OnMyLocationButtonClickListener() {
-                    fun onMyLocationButtonClick(): Boolean {
+                    GoogleMap.OnMyLocationButtonClickListener {
+                    override fun onMyLocationButtonClick(): Boolean {
                         cameraPositionBuilder.target(currentLocationMarker.getPosition())
-                        cameraPositionBuilder.zoom(16)
+                        cameraPositionBuilder.zoom(16f)
                         googleMap.animateCamera(
                             CameraUpdateFactory.newCameraPosition(
                                 cameraPositionBuilder.build()
@@ -255,14 +277,14 @@ class MapsFragment : Fragment(), SensorEventListener {
                         return true
                     }
                 })
-                googleMap.setOnMyLocationClickListener(object : OnMyLocationClickListener() {
-                    fun onMyLocationClick(location: Location) {
+                googleMap.setOnMyLocationClickListener(object : GoogleMap.OnMyLocationClickListener {
+                    override fun onMyLocationClick(location: Location) {
                         permissionActivity.fusedLocation.currentLocation.setValue(location)
                         viewModel.currentLocation = location
                         val currentPosition = LatLng(location.latitude, location.longitude)
                         currentLocationMarker.setPosition(currentPosition)
                         cameraPositionBuilder.target(currentLocationMarker.getPosition())
-                        cameraPositionBuilder.zoom(16)
+                        cameraPositionBuilder.zoom(16f)
                         googleMap.animateCamera(
                             CameraUpdateFactory.newCameraPosition(
                                 cameraPositionBuilder.build()
@@ -291,7 +313,7 @@ class MapsFragment : Fragment(), SensorEventListener {
                 )
             }
         })
-        binding.category.setOnItemClickListener(object : OnItemClickListener {
+        binding.category.setOnItemClickListener(object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
                 if (position < categories.size - 1) {
                     binding.searchPlaces.setText(categories[position])
@@ -299,22 +321,22 @@ class MapsFragment : Fragment(), SensorEventListener {
                 }
             }
         })
-        binding.searchPlaces.setOnItemClickListener(object : OnItemClickListener {
+        binding.searchPlaces.onItemClickListener = object : AdapterView.OnItemClickListener {
             override fun onItemClick(parent: AdapterView<*>?, view: View, position: Int, id: Long) {
                 val result: Result = addressAdapter.resultList.get(position)
-                val latLng = LatLng(result.position.lat, result.position.lon)
+                val latLng = LatLng(result.position!!.lat!!, result.position!!.lon!!)
                 if (destinationMarker != null) destinationMarker.remove()
-                destinationMarker = googleMap.addMarker(MarkerOptions().position(latLng))
+                destinationMarker = googleMap.addMarker(MarkerOptions().position(latLng))!!
                 //                viewModel.fetchRoutes(latLng).observe(getViewLifecycleOwner(), new Observer<RouteResponse>() {
-//                    @Override
-//                    public void onChanged(RouteResponse routeResponse) {
-//                        if (routeResponse != null) createRoute(routeResponse);
-//                    }
-//                });
-                binding.searchPlaces.setText(result.poi.name, false)
+    //                    @Override
+    //                    public void onChanged(RouteResponse routeResponse) {
+    //                        if (routeResponse != null) createRoute(routeResponse);
+    //                    }
+    //                });
+                binding.searchPlaces.setText(result.poi!!.name, false)
                 binding.searchPlaces.dismissDropDown()
             }
-        })
+        }
         binding.searchPlaces.addTextChangedListener(object : TextWatcher {
             override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {}
@@ -353,12 +375,12 @@ class MapsFragment : Fragment(), SensorEventListener {
 ////                            if (!legs.isEmpty()) {
 //        List<Point> points = legs.get(0).getPoints();
 //        for (Point point : points) {
-//            polylineOptions.add(new LatLng(point.getLatitude(), point.getLongitude()));
+//            polylineOptions.add(new LatLng(point.latitude, point.longitude));
 //        }
-        markerOptions.position(viewModel.destination)
-        destinationMarker = googleMap.addMarker(markerOptions)
+        markerOptions.position(viewModel.destination!!)
+        destinationMarker = googleMap.addMarker(markerOptions)!!
         Log.e("Destination", "Marker Added")
-        val bounds: LatLngBounds = Builder()
+        val bounds: LatLngBounds = LatLngBounds.Builder()
             .include(currentLocationMarker.getPosition())
             .include(destinationMarker.getPosition())
             .build()
@@ -391,7 +413,7 @@ class MapsFragment : Fragment(), SensorEventListener {
             ) + 360).toInt() % 360
         }
         mAzimuth = Math.round(mAzimuth.toFloat())
-        binding.imgCompass.setRotation(-mAzimuth)
+        binding.imgCompass.rotation = -mAzimuth.toFloat()
     }
 
     override fun onAccuracyChanged(sensor: Sensor, i: Int) {}
@@ -403,8 +425,8 @@ class MapsFragment : Fragment(), SensorEventListener {
             ) {
                 binding.imgCompass.setVisibility(View.GONE)
             } else {
-                mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
-                mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
+                mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)!!
+                mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)!!
                 haveSensor = mSensorManager.registerListener(
                     this,
                     mAccelerometer,
@@ -417,7 +439,7 @@ class MapsFragment : Fragment(), SensorEventListener {
                 )
             }
         } else {
-            mRotationV = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)
+            mRotationV = mSensorManager.getDefaultSensor(Sensor.TYPE_ROTATION_VECTOR)!!
             haveSensor =
                 mSensorManager.registerListener(this, mRotationV, SensorManager.SENSOR_DELAY_UI)
         }
@@ -432,12 +454,12 @@ class MapsFragment : Fragment(), SensorEventListener {
         }
     }
 
-    fun onPause() {
+    override fun onPause() {
         super.onPause()
         stop()
     }
 
-    fun onResume() {
+    override fun onResume() {
         super.onResume()
         start()
     }

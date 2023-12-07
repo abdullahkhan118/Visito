@@ -3,16 +3,26 @@ package com.horux.visito.adapters
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.horux.visito.R
+import com.horux.visito.activities.EventDescriptionActivity
+import com.horux.visito.databinding.PlacesRowBinding
+import com.horux.visito.globals.AppConstants
+import com.horux.visito.loadImage
+import com.horux.visito.models.dao.EventModel
 import java.util.Objects
 
 class EventsAdapter(
     private val activity: Activity,
     inflater: LayoutInflater,
     list: ArrayList<EventModel>
-) : RecyclerView.Adapter<EventsViewHolder?>() {
+) : RecyclerView.Adapter<EventsAdapter.EventsViewHolder?>() {
     private val inflater: LayoutInflater
     private var list: ArrayList<EventModel>
 
@@ -21,22 +31,19 @@ class EventsAdapter(
         this.list = list
     }
 
-    fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): EventsViewHolder {
         val view: View = inflater.inflate(R.layout.places_row, parent, false)
-        return EventsViewHolder(Objects.requireNonNull(DataBindingUtil.bind(view)))
+        return EventsViewHolder(Objects.requireNonNull(DataBindingUtil.bind<PlacesRowBinding>(view))!!)
     }
 
-    fun onBindViewHolder(holder: EventsViewHolder, position: Int) {
+    override fun getItemCount(): Int {
+        return list.size
+    }
+
+    override fun onBindViewHolder(holder: EventsViewHolder, position: Int) {
         val event: EventModel = list[position]
-        holder.binding.name.setText(event.getTitle())
-        val options: RequestOptions = RequestOptions()
-            .fitCenter()
-            .placeholder(R.drawable.img_loading)
-            .error(R.drawable.img_no_image)
-        Glide.with(activity)
-            .load(event.getImage())
-            .apply(options)
-            .into(holder.binding.image)
+        holder.binding.name.setText(event.title)
+        loadImage(activity,event.image,holder.binding.image)
         holder.itemView.setOnClickListener(View.OnClickListener {
             val intent = Intent(activity, EventDescriptionActivity::class.java)
             val bundle = Bundle()

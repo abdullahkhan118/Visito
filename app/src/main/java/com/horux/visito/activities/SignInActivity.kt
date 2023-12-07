@@ -4,21 +4,44 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.WindowManager
+import androidx.activity.viewModels
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
+import com.facebook.CallbackManager
+import com.facebook.FacebookCallback
+import com.facebook.FacebookException
+import com.facebook.login.LoginResult
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount
+import com.google.android.gms.auth.api.signin.GoogleSignInClient
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
+import com.google.android.gms.common.api.ApiException
+import com.google.android.gms.tasks.Task
+import com.google.firebase.auth.AuthCredential
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FacebookAuthProvider
+import com.horux.visito.R
+import com.horux.visito.databinding.ActivitySigninBinding
+import com.horux.visito.databinding.ForgotPasswordBinding
+import com.horux.visito.operations.business_logic.Validations
+import com.horux.visito.operations.ui_operations.DialogPrompt
+import com.horux.visito.viewmodels.SignInViewModel
 import java.util.Arrays
 
 class SignInActivity : AppCompatActivity() {
     var callbackManager: CallbackManager = CallbackManager.Factory.create()
     private var mGoogleSignInClient: GoogleSignInClient? = null
-    private var viewModel: SignInViewModel? = null
-    private var binding: ActivitySigninBinding? = null
+    private val viewModel: SignInViewModel by viewModels<SignInViewModel>()
+    private val binding: ActivitySigninBinding by lazy { DataBindingUtil.setContentView(this, R.layout.activity_signin) }
 
     //Facebook Login
     private val EMAIL = "email"
-    protected fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_signin)
         getWindow()
             .setStatusBarColor(
                 ContextCompat.getColor(
@@ -27,12 +50,11 @@ class SignInActivity : AppCompatActivity() {
                 )
             )
         setContentView(binding.getRoot())
-        viewModel = ViewModelProvider(this).get<SignInViewModel>(SignInViewModel::class.java)
-        if (viewModel.isLoggedIn()) {
+        if (viewModel.isLoggedIn) {
             startActivity(Intent(this@SignInActivity, HomeActivity::class.java))
             finish()
         }
-        val gso: GoogleSignInOptions = Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+        val gso: GoogleSignInOptions = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
             .requestEmail()
             .requestProfile()
             .requestId()
@@ -40,22 +62,22 @@ class SignInActivity : AppCompatActivity() {
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso)
     }
 
-    protected fun onStart() {
+    override fun onStart() {
         super.onStart()
-        binding.emailAddress.setText(viewModel.getEmail())
-        binding.password.setText(viewModel.getPassword())
+        binding.emailAddress.setText(viewModel.email)
+        binding.password.setText(viewModel.password)
     }
 
     fun signIn(view: View?) {
-        viewModel.setEmail(binding.emailAddress.getText().toString())
-        viewModel.setPassword(binding.password.getText().toString())
+        viewModel.email = (binding.emailAddress.getText().toString())
+        viewModel.password = (binding.password.getText().toString())
         if (validInputs()) {
             binding.signinProgress.setVisibility(View.VISIBLE)
             viewModel
                 .signIn(this)
                 .observe(
                     this,
-                    Observer<Any?> { authResultTask -> onSignInResponse(authResultTask) })
+                    Observer { authResultTask -> onSignInResponse(authResultTask) })
         }
     }
 
@@ -86,7 +108,7 @@ class SignInActivity : AppCompatActivity() {
     }
 
     fun signInWithGoogle(view: View?) {
-        val signInIntent: Intent = mGoogleSignInClient.getSignInIntent()
+        val signInIntent: Intent = mGoogleSignInClient!!.getSignInIntent()
         startActivityForResult(signInIntent, RC_SIGN_IN)
     }
 
@@ -94,22 +116,22 @@ class SignInActivity : AppCompatActivity() {
         binding.loginButton.setPermissions(Arrays.asList(EMAIL))
         binding.loginButton.registerCallback(
             callbackManager,
-            object : FacebookCallback<LoginResult?>() {
-                fun onSuccess(loginResult: LoginResult) {
+            object : FacebookCallback<LoginResult> {
+                override fun onSuccess(loginResult: LoginResult) {
                     val credential: AuthCredential =
-                        FacebookAuthProvider.getCredential(loginResult.getAccessToken().getToken())
+                        FacebookAuthProvider.getCredential(loginResult.accessToken.token)
                     viewModel
                         .signInWithCredentials(this@SignInActivity, credential)
                         .observe(
                             this@SignInActivity,
-                            Observer<Any?> { authResultTask -> onSignInResponse(authResultTask) })
+                            Observer { authResultTask -> onSignInResponse(authResultTask) })
                 }
 
-                fun onCancel() {
+                override fun onCancel() {
                     loginUnsuccessful()
                 }
 
-                fun onError(exception: FacebookException?) {
+                override fun onError(exception: FacebookException) {
                     loginUnsuccessful()
                 }
             })
@@ -125,10 +147,10 @@ class SignInActivity : AppCompatActivity() {
             .show()
         forgotPasswordBinding.btnSendEmail.setOnClickListener { dialogView ->
             showProgressBar(true)
-            viewModel.setEmail(forgotPasswordBinding.emailAddress.getText().toString())
+            viewModel.email = (forgotPasswordBinding.emailAddress.getText().toString())
             viewModel
                 .forgotPassword(this)
-                .observe(this, Observer<Any?> { voidTask ->
+                .observe(this, Observer { voidTask ->
                     if (voidTask.isSuccessful()) {
                         showProgressBar(false)
                         DialogPrompt().showMessage(
@@ -154,14 +176,14 @@ class SignInActivity : AppCompatActivity() {
     }
 
     private fun validInputs(): Boolean {
-        val isEmailValid: Boolean = Validations.isEmailValid(viewModel.getEmail())
+        val isEmailValid: Boolean = Validations.isEmailValid(viewModel.email)
         if (!isEmailValid) {
             binding.emailError.setText(Validations.STRING_INVALID_EMAIL)
             binding.emailError.setVisibility(View.VISIBLE)
         } else {
             binding.emailError.setVisibility(View.GONE)
         }
-        val isPasswordValid: Boolean = Validations.isPasswordValid(viewModel.getPassword())
+        val isPasswordValid: Boolean = Validations.isPasswordValid(viewModel.password)
         if (!isPasswordValid) {
             binding.passwordError.setText(Validations.STRING_INVALID_PASSWORD)
             binding.passwordError.setVisibility(View.VISIBLE)
@@ -184,7 +206,7 @@ class SignInActivity : AppCompatActivity() {
         }
     }
 
-    protected fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         Log.e("ActivityResult", requestCode.toString() + "")
         if (requestCode == RC_SIGN_IN) {
@@ -200,7 +222,7 @@ class SignInActivity : AppCompatActivity() {
                 .signInWithGoogle(this@SignInActivity, account.getEmail(), account.getId())
                 .observe(
                     this@SignInActivity,
-                    Observer<Any?> { authResultTask -> onSignInResponse(authResultTask) })
+                    Observer { authResultTask -> onSignInResponse(authResultTask) })
         } catch (e: ApiException) {
             e.printStackTrace()
             loginUnsuccessful()

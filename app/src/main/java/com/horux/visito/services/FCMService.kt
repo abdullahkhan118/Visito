@@ -1,28 +1,39 @@
 package com.horux.visito.services
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.media.RingtoneManager
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import androidx.core.app.NotificationCompat
 import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.firebase.messaging.FirebaseMessaging
+import com.google.firebase.messaging.FirebaseMessagingService
+import com.google.firebase.messaging.RemoteMessage
+import com.horux.visito.R
+import com.horux.visito.activities.SignInActivity
 
 class FCMService : FirebaseMessagingService() {
     private var notificationCount = 0
-    fun onNewToken(s: String) {
+    override fun onNewToken(s: String) {
         super.onNewToken(s)
         token = s
         Log.e("FCM_Token", token)
     }
 
-    fun onMessageReceived(remoteMessage: RemoteMessage) {
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
         super.onMessageReceived(remoteMessage)
         var messageBody = ""
         var title = ""
         if (remoteMessage.getNotification() != null) {
-            val notification: RemoteMessage.Notification = remoteMessage.getNotification()
-            if (notification.getBody() != null) messageBody = notification.getBody()
-            if (notification.getTitle() != null) title = notification.getTitle()
+            val notification: RemoteMessage.Notification = remoteMessage.getNotification()!!
+            if (notification.getBody() != null) messageBody = notification.getBody()!!
+            if (notification.title != null) title = notification.title!!
             sendNotification(messageBody, title)
         }
     }
@@ -65,12 +76,10 @@ class FCMService : FirebaseMessagingService() {
         var token = ""
         fun setToken(): Task<String> {
             return FirebaseMessaging.getInstance().getToken()
-                .addOnCompleteListener(object : OnCompleteListener<String?>() {
-                    fun onComplete(task: Task<String?>) {
-                        if (task.isSuccessful()) token = task.getResult()
-                        Log.e("FCM_Token", token)
-                    }
-                })
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) token = task.getResult()!!
+                    Log.e("FCM_Token", token)
+                }
         }
     }
 }

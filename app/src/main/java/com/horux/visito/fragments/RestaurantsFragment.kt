@@ -3,17 +3,27 @@ package com.horux.visito.fragments
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.maps.model.LatLng
+import com.horux.visito.R
+import com.horux.visito.activities.HomeActivity
+import com.horux.visito.adapters.PlacesAdapter
+import com.horux.visito.databinding.FragmentRestaurantsBinding
+import com.horux.visito.models.dao.PlaceModel
+import com.horux.visito.operations.ui_operations.MapOperations
+import com.horux.visito.viewmodels.RestaurantsViewModel
 
 class RestaurantsFragment : Fragment() {
-    private var homeActivity: HomeActivity? = null
-    private var viewModel: RestaurantsViewModel? = null
-    private var binding: FragmentRestaurantsBinding? = null
-    private var adapter: PlacesAdapter? = null
-    fun onCreateView(
+    private lateinit var homeActivity: HomeActivity
+    private lateinit var viewModel: RestaurantsViewModel
+    private lateinit var binding: FragmentRestaurantsBinding
+    private lateinit var adapter: PlacesAdapter
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -25,37 +35,36 @@ class RestaurantsFragment : Fragment() {
         return binding.getRoot()
     }
 
-    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeActivity = requireActivity() as HomeActivity?
+        homeActivity = requireActivity() as HomeActivity
         adapter = PlacesAdapter(homeActivity, getLayoutInflater(), ArrayList<PlaceModel>())
         binding.recycleList.setAdapter(adapter)
         binding.nearbyRestaurants.setOnClickListener(View.OnClickListener {
             binding.nearbyRestaurants.setBackgroundResource(R.drawable.bordered_background)
             binding.popularRestaurants.setBackgroundResource(R.drawable.app_background)
-            if (viewModel.restaurants.getValue() != null) adapter.updateList(getNearBy(viewModel.restaurants.getValue())) else adapter.updateList(
+            if (viewModel.restaurants.getValue() != null) adapter.updateList(getNearBy(viewModel.restaurants.getValue()!!)) else adapter.updateList(
                 ArrayList<PlaceModel>()
             )
         })
         binding.popularRestaurants.setOnClickListener(View.OnClickListener {
             binding.popularRestaurants.setBackgroundResource(R.drawable.bordered_background)
             binding.nearbyRestaurants.setBackgroundResource(R.drawable.app_background)
-            if (viewModel.restaurants.getValue() != null) adapter.updateList(viewModel.restaurants.getValue()) else adapter.updateList(
+            if (viewModel.restaurants.getValue() != null) adapter.updateList(viewModel.restaurants.getValue()!!) else adapter.updateList(
                 ArrayList<PlaceModel>()
             )
         })
     }
 
-    fun onStart() {
+    override fun onStart() {
         super.onStart()
-        if (homeActivity.isInternetAvailable()) {
+        if (homeActivity.isInternetAvailable) {
             viewModel.fetchRestaurants()
-                .observe(getViewLifecycleOwner(), object : Observer<ArrayList<PlaceModel?>?> {
-                    override fun onChanged(placeModels: ArrayList<PlaceModel?>) {
-                        adapter.updateList(placeModels)
-                        homeActivity.setLoaderVisibility(false)
-                    }
-                })
+                .observe(getViewLifecycleOwner()
+                ) { placeModels ->
+                    adapter.updateList(placeModels)
+                    homeActivity.setLoaderVisibility(false)
+                }
         }
     }
 
@@ -65,7 +74,7 @@ class RestaurantsFragment : Fragment() {
         if (currentLocation != null) {
             val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
             for (placeModel in placeModels) {
-                val placeLatLng = LatLng(placeModel.getLatitude(), placeModel.getLongitude())
+                val placeLatLng = LatLng(placeModel.latitude, placeModel.longitude)
                 val distance: Double = MapOperations.getDistance(currentLatLng, placeLatLng)
                 if (distance <= 10000) nearbyPlaces.add(placeModel)
             }
@@ -74,7 +83,7 @@ class RestaurantsFragment : Fragment() {
         return nearbyPlaces
     }
 
-    fun onStop() {
+    override fun onStop() {
         super.onStop()
     }
 }

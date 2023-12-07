@@ -1,16 +1,22 @@
 package com.horux.visito.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.horux.visito.activities.HomeActivity
+import com.horux.visito.databinding.FragmentHelpBinding
+import com.horux.visito.globals.UserGlobals
+import com.horux.visito.viewmodels.HelpViewModel
 
 class HelpFragment : Fragment() {
-    private var homeActivity: HomeActivity? = null
-    private var viewModel: HelpViewModel? = null
-    private var binding: FragmentHelpBinding? = null
-    fun onCreateView(
+    private lateinit var homeActivity: HomeActivity
+    private lateinit var viewModel: HelpViewModel
+    private lateinit var binding: FragmentHelpBinding
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -21,23 +27,23 @@ class HelpFragment : Fragment() {
         return binding.getRoot()
     }
 
-    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeActivity = requireActivity() as HomeActivity?
+        homeActivity = requireActivity() as HomeActivity
     }
 
-    fun onStart() {
+    override fun onStart() {
         super.onStart()
-        binding.message.setText(viewModel.message.getValue().getMessage())
+        binding.message.setText(viewModel.message.value!!.message)
         binding.sendMessage.setOnClickListener(View.OnClickListener {
-            viewModel.message.getValue().setId(UserGlobals.user.getUid())
-            viewModel.message.getValue().setMessage(binding.message.getText().toString())
-            if (homeActivity.isInternetAvailable()) {
+            viewModel.message.getValue()!!.id = (UserGlobals.user!!.getUid())
+            viewModel.message.getValue()!!.message = (binding.message.getText().toString())
+            if (homeActivity.isInternetAvailable) {
                 viewModel.sendMessage()
-                    .observe(getViewLifecycleOwner(), Observer<Any?> { messageModel ->
+                    .observe(getViewLifecycleOwner(), Observer { messageModel ->
                         homeActivity.setLoaderVisibility(false)
-                        if (messageModel.getMessage() == viewModel.message.getValue()
-                                .getMessage()
+                        if (messageModel.message == viewModel.message.getValue()!!
+                                .message
                         ) {
                             homeActivity.showMessage("Your query has been sent.")
                         }
@@ -47,9 +53,9 @@ class HelpFragment : Fragment() {
         })
     }
 
-    fun onStop() {
-        viewModel.message.getValue().setId(UserGlobals.user.getUid())
-        viewModel.message.getValue().setMessage(binding.message.getText().toString())
+    override fun onStop() {
+        viewModel.message.value!!.id = (UserGlobals.user!!.getUid())
+        viewModel.message.value!!.message = (binding.message.getText().toString())
         super.onStop()
     }
 }

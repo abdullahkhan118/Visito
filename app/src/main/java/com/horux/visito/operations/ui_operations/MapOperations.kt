@@ -1,6 +1,14 @@
 package com.horux.visito.operations.ui_operations
 
+import androidx.annotation.ColorRes
 import com.google.android.gms.maps.CameraUpdateFactory
+import com.google.android.gms.maps.GoogleMap
+import com.google.android.gms.maps.OnMapReadyCallback
+import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.LatLngBounds
+import com.google.android.gms.maps.model.MarkerOptions
+import com.google.android.gms.maps.model.PolygonOptions
 
 object MapOperations {
     //    fun mapInit(map: SupportMapFragment, addListener: Boolean) {
@@ -31,17 +39,15 @@ object MapOperations {
     //
     //        })
     //    }
-    fun mapInit(map: SupportMapFragment, currentLatLng: LatLng?, addListener: Boolean?) {
-        map.getMapAsync(object : OnMapReadyCallback() {
-            fun onMapReady(googleMap: GoogleMap) {
-                addMarkerToLocation(
-                    googleMap,
-                    currentLatLng,
-                    "Current Location",
-                    "Address Unknown lat: \${it.latitude} lng: \${it.longitude}"
-                )
-            }
-        })
+    fun mapInit(map: SupportMapFragment, currentLatLng: LatLng, addListener: Boolean?) {
+        map.getMapAsync { googleMap ->
+            addMarkerToLocation(
+                googleMap,
+                currentLatLng,
+                "Current Location",
+                "Address Unknown lat: \${it.latitude} lng: \${it.longitude}"
+            )
+        }
     }
 
     //    fun addMarkerToLocation(
@@ -69,9 +75,9 @@ object MapOperations {
     //    }
     fun addMarkerToLocation(
         gMap: GoogleMap,
-        latLng: LatLng?,
-        title: String?,
-        snippet: String?
+        latLng: LatLng,
+        title: String,
+        snippet: String
     ): MarkerOptions {
         val markerOptions: MarkerOptions =
             MarkerOptions().position(latLng).title(title).snippet(snippet)
@@ -203,7 +209,7 @@ object MapOperations {
     //        //LatLng Bound Requires two LatLngs
     //        return boundBuilder.build()
     //    }
-    fun getBounds(latLng1: LatLng?, latLng2: LatLng?): LatLngBounds {
+    fun getBounds(latLng1: LatLng, latLng2: LatLng): LatLngBounds {
         val builder: LatLngBounds.Builder = LatLngBounds.builder()
         builder.include(latLng1).include(latLng2)
         return builder.build()

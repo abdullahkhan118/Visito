@@ -9,17 +9,17 @@ class HomeViewModel : ViewModel() {
     private var repository: HomeRepository? = null
     val user: MutableLiveData<UserModel>
         get() {
-            if (repository == null) repository = HomeRepository.Companion.getInstance()
+            if (repository == null) repository = HomeRepository.instance
             return repository!!.user
         }
 
     fun updateUser(userModel: UserModel): MutableLiveData<UserModel> {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+        if (repository == null) repository = HomeRepository.instance
         return repository!!.updateUser(userModel)
     }
 
     fun logout() {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+        if (repository == null) repository = HomeRepository.instance
         repository!!.logout()
     }
 }

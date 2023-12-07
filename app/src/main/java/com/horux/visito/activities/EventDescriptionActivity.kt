@@ -6,49 +6,49 @@ import android.net.Uri
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.viewModels
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import com.bumptech.glide.Glide
+import com.bumptech.glide.request.RequestOptions
+import com.google.android.gms.maps.model.LatLng
 import com.horux.visito.R
 import com.horux.visito.databinding.ActivityEventDescriptionBinding
 import com.horux.visito.globals.AppConstants
+import com.horux.visito.loadImage
 import com.horux.visito.models.dao.EventModel
+import com.horux.visito.operations.ui_operations.DialogPrompt
 import com.horux.visito.viewmodels.EventDescriptionViewModel
 
 class EventDescriptionActivity : PermissionActivity() {
-    private var viewModel: EventDescriptionViewModel? = null
-    private var binding: ActivityEventDescriptionBinding? = null
+    private val viewModel: EventDescriptionViewModel by viewModels<EventDescriptionViewModel>()
+    private val binding: ActivityEventDescriptionBinding by lazy {
+        DataBindingUtil.setContentView(this, R.layout.activity_event_description)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_event_description)
-        viewModel =
-            ViewModelProvider(this).get<EventDescriptionViewModel>(EventDescriptionViewModel::class.java)
         setObservers()
         setOnClickListeners()
-        val eventModel: EventModel = getIntent().getParcelableExtra(AppConstants.STRING_DATA)
+        val eventModel: EventModel = getIntent().getParcelableExtra(AppConstants.STRING_DATA)!!
         Log.e("PlaceModel", eventModel.toString())
-        viewModel.setEvent(eventModel)
+        viewModel.event.value = eventModel
     }
 
     private fun setObservers() {
-        viewModel.getEvent().observe(this, Observer<Any?> { event ->
+        viewModel.event.observe(this, Observer { event ->
             if (event != null) {
-                binding.pName.setText(event.getTitle())
-                binding.pDescription.setText(event.getDescription())
-                binding.pTiming.setText("Timing: " + event.getStartTime() + " - " + event.getEndTime())
-                binding.pAddress.setText("Address: " + event.getAddress().replace("\n", ""))
-                val options: RequestOptions = RequestOptions()
-                    .fitCenter()
-                    .placeholder(R.drawable.img_loading)
-                    .error(R.drawable.img_no_image)
-                Glide.with(this@EventDescriptionActivity).load(event.getImage()).apply(options)
-                    .into(binding.pImage)
+                binding.pName.setText(event.title)
+                binding.pDescription.setText(event.description)
+                binding.pTiming.setText("Timing: " + event.startTime + " - " + event.endTime)
+                binding.pAddress.setText("Address: " + event.address!!.replace("\n", ""))
+                loadImage(this@EventDescriptionActivity,event.image,binding.pImage)
                 startLocationUpdates()
-                val locationObserver: Observer<*> = object : Observer<Location?> {
+                val locationObserver: Observer<*> = object : Observer<Location> {
                     override fun onChanged(location: Location) {
                         viewModel.location.setValue(location)
-                        val eventLatLng = LatLng(event.getLatitude(), event.getLongitude())
+                        val eventLatLng = LatLng(event.latitude, event.longitude)
                         if (viewModel.getDistance().getValue() == null) {
                             viewModel
                                 .setDistance(
@@ -56,7 +56,7 @@ class EventDescriptionActivity : PermissionActivity() {
                                     eventLatLng,
                                     this@EventDescriptionActivity
                                 )
-                                .observe(this@EventDescriptionActivity, object : Observer<Float?> {
+                                .observe(this@EventDescriptionActivity, object : Observer<Float> {
                                     override fun onChanged(distance: Float) {
                                         binding.pDistance.setText("Distance: $distance km")
                                         stopLocationUpdates()
@@ -76,20 +76,20 @@ class EventDescriptionActivity : PermissionActivity() {
     private fun setOnClickListeners() {
         binding.pMap.setOnClickListener(View.OnClickListener {
             val intent: Intent = Intent(this@EventDescriptionActivity, MapActivity::class.java)
-            intent.putExtra(AppConstants.STRING_DATA, viewModel.getEvent().getValue())
+            intent.putExtra(AppConstants.STRING_DATA, viewModel.event.value)
             intent.putExtra(AppConstants.STRING_TYPE, AppConstants.STRING_EVENTS)
             startActivity(intent)
         })
         binding.bookARide.setOnClickListener(View.OnClickListener {
-            if (viewModel.location.getValue() != null && viewModel.getEvent().getValue() != null) {
+            if (viewModel.location.value != null && viewModel.event.value != null) {
                 val clientID = "q7lhyjZxFyXnaJ1ChgegTgISMqFKo8-R"
                 val productID = "a1111c8c-c720-46c3-8534-2fcdd730040d"
-                val pickUpLat: String = viewModel.location.getValue().getLatitude().toString() + ""
-                val pickUpLon: String = viewModel.location.getValue().getLongitude().toString() + ""
+                val pickUpLat: String = viewModel.location.value!!.latitude.toString() + ""
+                val pickUpLon: String = viewModel.location.value!!.longitude.toString() + ""
                 val dropOffLat: String =
-                    viewModel.getEvent().getValue().getLatitude().toString() + ""
+                    viewModel.event.value!!.latitude.toString() + ""
                 val dropOffLon: String =
-                    viewModel.getEvent().getValue().getLongitude().toString() + ""
+                    "${viewModel.event.value!!.longitude}"
                 val nativeAppIntent = Intent(
                     Intent.ACTION_VIEW, Uri.parse(
                         "https://m.uber.com/ul/?" +

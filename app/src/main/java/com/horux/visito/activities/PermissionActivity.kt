@@ -2,9 +2,12 @@ package com.horux.visito.activities
 
 import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.app.ActivityCompat
+import com.horux.visito.operations.business_logic.FusedLocation
 import java.util.Arrays
 
 open class PermissionActivity : AppCompatActivity() {
@@ -17,7 +20,7 @@ open class PermissionActivity : AppCompatActivity() {
     private val CALL_PERMISSIONS = arrayOf(
         Manifest.permission.CALL_PHONE
     )
-    var fusedLocation: FusedLocation = FusedLocation.Companion.getInstance()
+    var fusedLocation: FusedLocation = FusedLocation.instance
     var phoneNumber = ""
     fun startLocationUpdates() {
         if (ActivityCompat.checkSelfPermission(
@@ -74,7 +77,7 @@ open class PermissionActivity : AppCompatActivity() {
         }
     }
 
-    fun onRequestPermissionsResult(
+    override fun onRequestPermissionsResult(
         requestCode: Int,
         permissions: Array<String?>,
         grantResults: IntArray
@@ -104,7 +107,7 @@ open class PermissionActivity : AppCompatActivity() {
         }
     }
 
-    protected open fun onStop() {
+    override fun onStop() {
         super.onStop()
         fusedLocation.stopLocationUpdates()
     }

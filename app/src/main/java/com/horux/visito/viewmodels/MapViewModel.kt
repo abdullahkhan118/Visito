@@ -1,8 +1,15 @@
 package com.horux.visito.viewmodels
 
 import android.location.Location
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.horux.visito.models.tomtom.autocomplete.AutoCompleteResponse
+import com.horux.visito.models.tomtom.route.RouteResponse
+import com.horux.visito.models.weather.CurrentWeatherResponse
+import com.horux.visito.repositories.ApiRepository
 
 class MapViewModel : ViewModel() {
     var repository: ApiRepository? = null
@@ -17,14 +24,14 @@ class MapViewModel : ViewModel() {
         query: String?,
         radiusInKM: Int,
         latLng: LatLng,
-        viewLifecycleOwner: LifecycleOwner?
+        viewLifecycleOwner: LifecycleOwner
     ): MutableLiveData<AutoCompleteResponse> {
-        if (repository == null) repository = ApiRepository.Companion.getInstance()
-        repository
+        if (repository == null) repository = ApiRepository.instance
+        repository!!
             .getAutoComplete(query, radiusInKM, latLng.latitude as Float, latLng.longitude as Float)
             .observe(
                 viewLifecycleOwner,
-                Observer<Any?> { autoCompleteResponse ->
+                Observer<AutoCompleteResponse> { autoCompleteResponse ->
                     if (autoCompleteResponse != null) autoComplete.setValue(autoCompleteResponse) else autoComplete.setValue(
                         autoCompleteResponse
                     )
@@ -33,16 +40,16 @@ class MapViewModel : ViewModel() {
     }
 
     fun fetchCategories(): MutableLiveData<ArrayList<String>> {
-        if (repository == null) repository = ApiRepository.Companion.getInstance()
-        categories = repository.fetchCategories()
+        if (repository == null) repository = ApiRepository.instance
+        categories = repository!!.fetchCategories()
         return categories
     }
 
-    fun weatherForecast(viewLifecycleOwner: LifecycleOwner?): MutableLiveData<CurrentWeatherResponse> {
-        if (repository == null) repository = ApiRepository.Companion.getInstance()
-        repository.getCurrentWeather().observe(
+    fun weatherForecast(viewLifecycleOwner: LifecycleOwner): MutableLiveData<CurrentWeatherResponse> {
+        if (repository == null) repository = ApiRepository.instance
+        repository!!.currentWeather.observe(
             viewLifecycleOwner,
-            Observer<Any?> { currentWeatherResponse -> weather.setValue(currentWeatherResponse) })
+            Observer<CurrentWeatherResponse> { currentWeatherResponse -> weather.setValue(currentWeatherResponse) })
         return weather
     }
 
@@ -50,8 +57,8 @@ class MapViewModel : ViewModel() {
         destination = destinationLatLng
         if (currentLocation != null) {
             val currentLatLng = LatLng(currentLocation!!.latitude, currentLocation!!.longitude)
-            if (repository == null) repository = ApiRepository.Companion.getInstance()
-            route = repository.getRoute(currentLatLng, destinationLatLng)
+            if (repository == null) repository = ApiRepository.instance
+            route = repository!!.getRoute(currentLatLng, destinationLatLng!!)
         }
         return route
     }

@@ -1,8 +1,15 @@
 package com.horux.visito.viewmodels
 
 import android.location.Location
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
+import com.horux.visito.models.dao.PlaceModel
+import com.horux.visito.models.tomtom.route.RouteResponse
+import com.horux.visito.repositories.ApiRepository
+import com.horux.visito.repositories.HomeRepository
 
 class PlaceDescriptionViewModel : ViewModel() {
     var location: MutableLiveData<Location> = MutableLiveData<Location>()
@@ -21,20 +28,17 @@ class PlaceDescriptionViewModel : ViewModel() {
     }
 
     fun updatePlaceRating() {
-        if (homeRepository == null) homeRepository = HomeRepository.Companion.getInstance()
+        if (homeRepository == null) homeRepository = HomeRepository.instance
         if (place.getValue() != null) {
-            homeRepository.updatePlace(place.getValue())
+            homeRepository!!.updatePlace(place.getValue()!!)
         }
     }
 
-    fun isFavorite(owner: LifecycleOwner?): MutableLiveData<Boolean> {
-        if (homeRepository == null) homeRepository = HomeRepository.Companion.getInstance()
+    fun isFavorite(owner: LifecycleOwner): MutableLiveData<Boolean> {
+        if (homeRepository == null) homeRepository = HomeRepository.instance
         if (place.getValue() != null) {
-            homeRepository.isFavorite(place.getValue()).observe(owner, object : Observer<Boolean?> {
-                override fun onChanged(favorite: Boolean) {
-                    isFavorite.setValue(favorite)
-                }
-            })
+            homeRepository!!.isFavorite(place.getValue()!!).observe(owner
+            ) { favorite -> isFavorite.setValue(favorite) }
         }
         return isFavorite
     }
@@ -42,17 +46,17 @@ class PlaceDescriptionViewModel : ViewModel() {
     fun setDistance(
         currentLatLng: LatLng,
         placeLatLng: LatLng,
-        owner: LifecycleOwner?
+        owner: LifecycleOwner
     ): MutableLiveData<Float> {
-        val current: String = currentLatLng.latitude + "," + currentLatLng.longitude
-        val place: String = placeLatLng.latitude + "," + placeLatLng.longitude
-        if (apiRepository == null) apiRepository = ApiRepository.Companion.getInstance()
-        apiRepository
+        val current: String = currentLatLng.latitude.toString() + "," + currentLatLng.longitude
+        val place: String = placeLatLng.latitude.toString() + "," + placeLatLng.longitude
+        if (apiRepository == null) apiRepository = ApiRepository.instance
+        apiRepository!!
             .getRoute(currentLatLng, placeLatLng)
-            .observe(owner, Observer<Any?> { routeResponse ->
+            .observe(owner, Observer<RouteResponse> { routeResponse ->
                 if (routeResponse != null) {
                     val lengthInMeters: Long =
-                        routeResponse.getRoutes().get(0).getSummary().getLengthInMeters()
+                        routeResponse.routes!!.get(0).summary!!.lengthInMeters!!
                     distance.setValue(lengthInMeters / 1000f)
                 } else {
                     val theta: Double = currentLatLng.longitude - placeLatLng.longitude
@@ -75,12 +79,12 @@ class PlaceDescriptionViewModel : ViewModel() {
     }
 
     fun addFavorite() {
-        if (homeRepository == null) homeRepository = HomeRepository.Companion.getInstance()
-        homeRepository.addFavorite(place.getValue())
+        if (homeRepository == null) homeRepository = HomeRepository.instance
+        homeRepository!!.addFavorite(place.getValue()!!)
     }
 
     fun removeFavorite() {
-        if (homeRepository == null) homeRepository = HomeRepository.Companion.getInstance()
-        homeRepository.removeFavorite(place.getValue())
+        if (homeRepository == null) homeRepository = HomeRepository.instance
+        homeRepository!!.removeFavorite(place.getValue()!!)
     }
 }

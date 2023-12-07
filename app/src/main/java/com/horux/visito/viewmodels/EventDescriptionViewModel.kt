@@ -7,6 +7,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.horux.visito.models.dao.EventModel
+import com.horux.visito.models.tomtom.route.RouteResponse
 import com.horux.visito.repositories.ApiRepository
 import com.horux.visito.repositories.HomeRepository
 
@@ -22,15 +23,15 @@ class EventDescriptionViewModel : ViewModel() {
     fun setDistance(
         currentLatLng: LatLng?,
         placeLatLng: LatLng?,
-        owner: LifecycleOwner?
+        owner: LifecycleOwner
     ): MutableLiveData<Float> {
         if (apiRepository == null) apiRepository = ApiRepository.instance
-        apiRepository
-            .getRoute(currentLatLng, placeLatLng)
-            .observe(owner, Observer<Any?> { routeResponse ->
+        apiRepository!!
+            .getRoute(currentLatLng!!, placeLatLng!!)
+            .observe(owner!!, Observer<RouteResponse> { routeResponse ->
                 if (routeResponse != null) {
                     val lengthInMeters: Long =
-                        routeResponse.getRoutes().get(0).getSummary().getLengthInMeters()
+                        routeResponse.routes!!.get(0).summary!!.lengthInMeters!!
                     distance.setValue(lengthInMeters / 1000f)
                 }
             })

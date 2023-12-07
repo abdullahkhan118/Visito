@@ -10,7 +10,7 @@ class RestaurantsViewModel : ViewModel() {
     var popularSelected = true
     var restaurants = MutableLiveData<ArrayList<PlaceModel>>()
     fun fetchRestaurants(): MutableLiveData<ArrayList<PlaceModel>> {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+        if (repository == null) repository = HomeRepository.instance
         restaurants = repository!!.fetchRestaurants()
         return restaurants
     }

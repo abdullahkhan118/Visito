@@ -5,7 +5,7 @@ import com.horux.visito.R
 import com.horux.visito.fragments.MapsFragment
 
 class MapActivity : PermissionActivity() {
-    protected fun onCreate(savedInstanceState: Bundle?) {
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
         getSupportFragmentManager()

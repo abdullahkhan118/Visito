@@ -3,6 +3,13 @@ package com.horux.visito.networking
 import android.util.Base64
 import android.util.Log
 import org.spongycastle.asn1.x500.X500Name
+import org.spongycastle.cert.X509CertificateHolder
+import org.spongycastle.cert.X509v3CertificateBuilder
+import org.spongycastle.cert.jcajce.JcaX509CertificateConverter
+import org.spongycastle.cert.jcajce.JcaX509v3CertificateBuilder
+import org.spongycastle.jce.provider.BouncyCastleProvider
+import org.spongycastle.operator.ContentSigner
+import org.spongycastle.operator.jcajce.JcaContentSignerBuilder
 import java.io.File
 import java.io.FileInputStream
 import java.io.FileOutputStream

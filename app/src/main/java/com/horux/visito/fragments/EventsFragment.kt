@@ -3,21 +3,30 @@ package com.horux.visito.fragments
 import android.location.Location
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.google.android.gms.maps.model.LatLng
+import com.horux.visito.R
+import com.horux.visito.activities.HomeActivity
+import com.horux.visito.adapters.EventsAdapter
+import com.horux.visito.databinding.FragmentEventsBinding
+import com.horux.visito.models.dao.EventModel
+import com.horux.visito.viewmodels.EventsViewModel
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.TimeUnit
 
 class EventsFragment : Fragment() {
-    private var homeActivity: HomeActivity? = null
-    private var viewModel: EventsViewModel? = null
-    private var binding: FragmentEventsBinding? = null
-    private var adapter: EventsAdapter? = null
-    fun onCreateView(
+    private lateinit var homeActivity: HomeActivity
+    private lateinit var viewModel: EventsViewModel
+    private lateinit var binding: FragmentEventsBinding
+    private lateinit var adapter: EventsAdapter
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -28,16 +37,16 @@ class EventsFragment : Fragment() {
         return binding.getRoot()
     }
 
-    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeActivity = requireActivity() as HomeActivity?
+        homeActivity = requireActivity() as HomeActivity
         adapter = EventsAdapter(homeActivity, getLayoutInflater(), ArrayList<EventModel>())
         binding.recycleList.setAdapter(adapter)
         binding.currentEvents.setOnClickListener(View.OnClickListener {
             viewModel.allEvents = false
             binding.currentEvents.setBackgroundResource(R.drawable.bordered_background)
             binding.allEvents.setBackgroundResource(R.drawable.app_background)
-            if (viewModel.events.getValue() != null) adapter.updateList(getCurrentEvents(viewModel.events.getValue())) else adapter.updateList(
+            if (viewModel.events.getValue() != null) adapter.updateList(getCurrentEvents(viewModel.events.getValue()!!)) else adapter.updateList(
                 ArrayList<EventModel>()
             )
         })
@@ -45,25 +54,25 @@ class EventsFragment : Fragment() {
             viewModel.allEvents = true
             binding.allEvents.setBackgroundResource(R.drawable.bordered_background)
             binding.currentEvents.setBackgroundResource(R.drawable.app_background)
-            if (viewModel.events.getValue() != null) adapter.updateList(viewModel.events.getValue()) else adapter.updateList(
+            if (viewModel.events.getValue() != null) adapter.updateList(viewModel.events.getValue()!!) else adapter.updateList(
                 ArrayList<EventModel>()
             )
         })
     }
 
-    fun onStart() {
+    override fun onStart() {
         super.onStart()
         homeActivity.startLocationUpdates()
-        if (homeActivity.isInternetAvailable()) {
+        if (homeActivity.isInternetAvailable) {
             viewModel.fetchEvents()
-                .observe(getViewLifecycleOwner(), object : Observer<ArrayList<EventModel?>?> {
-                    override fun onChanged(eventModels: ArrayList<EventModel>) {
-                        if (viewModel.allEvents) adapter.updateList(eventModels) else adapter.updateList(
-                            getCurrentEvents(eventModels)
-                        )
-                        homeActivity.setLoaderVisibility(false)
-                    }
-                })
+                .observe(
+                    viewLifecycleOwner
+                ) { eventModels ->
+                    if (viewModel.allEvents) adapter.updateList(eventModels) else adapter.updateList(
+                        getCurrentEvents(eventModels)
+                    )
+                    homeActivity.setLoaderVisibility(false)
+                }
         }
     }
 
@@ -75,8 +84,8 @@ class EventsFragment : Fragment() {
             for (eventModel in eventModels) {
                 try {
                     val sdf = SimpleDateFormat("EEE MMM d yyyy")
-                    var eventDate: String = eventModel.getStartTime()
-                        .substring(0, eventModel.getStartTime().indexOf(" at"))
+                    var eventDate: String = eventModel.startTime
+                        .substring(0, eventModel.startTime.indexOf(" at"))
                         .replace("\u00A0".toRegex(), "")
                     eventDate = eventDate.trim { it <= ' ' }
                     Log.e("EventDate", eventDate)
@@ -91,7 +100,7 @@ class EventsFragment : Fragment() {
         return currentEvents
     }
 
-    fun onStop() {
+    override fun onStop() {
         super.onStop()
     }
 

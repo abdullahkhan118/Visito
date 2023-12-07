@@ -10,7 +10,7 @@ class HotelsViewModel : ViewModel() {
     var popularSelected = true
     var hotels = MutableLiveData<ArrayList<PlaceModel>>()
     fun fetchHotels(): MutableLiveData<ArrayList<PlaceModel>> {
-        if (repository == null) repository = HomeRepository.Companion.getInstance()
+        if (repository == null) repository = HomeRepository.instance
         hotels = repository!!.fetchHotels()
         return hotels
     }

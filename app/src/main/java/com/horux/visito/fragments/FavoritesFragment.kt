@@ -1,17 +1,24 @@
 package com.horux.visito.fragments
 
 import android.os.Bundle
+import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import androidx.lifecycle.ViewModelProvider
+import com.horux.visito.activities.HomeActivity
+import com.horux.visito.adapters.FavoritesAdapter
+import com.horux.visito.databinding.FragmentFavoritesBinding
+import com.horux.visito.models.dao.PlaceModel
+import com.horux.visito.viewmodels.FavoritesViewModel
 
 class FavoritesFragment : Fragment() {
-    private var homeActivity: HomeActivity? = null
-    private var viewModel: FavoritesViewModel? = null
-    private var binding: FragmentFavoritesBinding? = null
-    private var adapter: FavoritesAdapter? = null
-    fun onCreateView(
+    private lateinit var homeActivity: HomeActivity
+    private lateinit var viewModel: FavoritesViewModel
+    private lateinit var binding: FragmentFavoritesBinding
+    private lateinit var adapter: FavoritesAdapter
+    override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -22,28 +29,26 @@ class FavoritesFragment : Fragment() {
         return binding.getRoot()
     }
 
-    fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        homeActivity = requireActivity() as HomeActivity?
+        homeActivity = requireActivity() as HomeActivity
         adapter = FavoritesAdapter(homeActivity, getLayoutInflater(), ArrayList<PlaceModel>())
         binding.favoritesList.setAdapter(adapter)
     }
 
-    fun onStart() {
+    override fun onStart() {
         super.onStart()
         homeActivity.startLocationUpdates()
-        if (homeActivity.isInternetAvailable()) {
-            viewModel.fetchFavorites(getViewLifecycleOwner())
-                .observe(getViewLifecycleOwner(), object : Observer<ArrayList<PlaceModel?>?> {
-                    override fun onChanged(placeModels: ArrayList<PlaceModel?>) {
-                        adapter.updateList(placeModels)
-                        homeActivity.setLoaderVisibility(false)
-                    }
-                })
+        if (homeActivity.isInternetAvailable) {
+            viewModel.fetchFavorites(viewLifecycleOwner)
+                .observe(viewLifecycleOwner) {
+                    adapter.updateList(it ?: arrayListOf())
+                    homeActivity.setLoaderVisibility(false)
+                }
         }
     }
 
-    fun onStop() {
+    override fun onStop() {
         super.onStop()
         homeActivity.setLoaderVisibility(false)
     }

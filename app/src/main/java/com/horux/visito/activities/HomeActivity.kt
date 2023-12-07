@@ -6,38 +6,60 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import androidx.activity.viewModels
+import androidx.core.content.ContextCompat
+import androidx.core.view.GravityCompat
 import androidx.databinding.DataBindingUtil
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.android.gms.tasks.Task
+import com.google.android.material.navigation.NavigationView
+import com.google.firebase.auth.FirebaseAuth
+import com.horux.visito.R
+import com.horux.visito.databinding.ActivityHomeBinding
+import com.horux.visito.databinding.NavHeaderMainBinding
+import com.horux.visito.fragments.AboutUsFragment
+import com.horux.visito.fragments.AccountFragment
+import com.horux.visito.fragments.EventsFragment
+import com.horux.visito.fragments.FavoritesFragment
+import com.horux.visito.fragments.HelpFragment
+import com.horux.visito.fragments.HotelsFragment
+import com.horux.visito.fragments.MapsFragment
+import com.horux.visito.fragments.PlacesFragment
+import com.horux.visito.fragments.RestaurantsFragment
+import com.horux.visito.globals.UserGlobals
+import com.horux.visito.network_check.InternetCheck
+import com.horux.visito.operations.ui_operations.DialogPrompt
+import com.horux.visito.services.FCMService
+import com.horux.visito.viewmodels.HomeViewModel
 
 class HomeActivity : PermissionActivity() {
-    var viewModel: HomeViewModel? = null
-    private var binding: ActivityHomeBinding? = null
-    private var navHeadBinding: NavHeaderMainBinding? = null
-    protected fun onCreate(savedInstanceState: Bundle?) {
+    val viewModel: HomeViewModel by viewModels<HomeViewModel>()
+    private val binding: ActivityHomeBinding by lazy { DataBindingUtil.setContentView(this, R.layout.activity_home) }
+    private val navHeadBinding: NavHeaderMainBinding by lazy { DataBindingUtil.inflate(
+        layoutInflater,
+        R.layout.nav_header_main,
+        binding.navView,
+        false
+    ) }
+    override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_home)
-        viewModel = ViewModelProvider(this).get<HomeViewModel>(HomeViewModel::class.java)
+        setContentView(binding.root)
         getWindow()
             .setStatusBarColor(ContextCompat.getColor(this.getApplicationContext(), R.color.orange))
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home)
         setSupportActionBar(binding.homeAppBarMain.toolbar)
-        navHeadBinding = DataBindingUtil.inflate(
-            getLayoutInflater(),
-            R.layout.nav_header_main,
-            binding.navView,
-            false
-        )
         binding.navView.addHeaderView(navHeadBinding.getRoot())
         binding.navView.setItemIconTintList(null)
         setOnClickListeners()
         UserGlobals.user = FirebaseAuth.getInstance().getCurrentUser()
-        viewModel.getUser().observe(this, Observer<Any?> { userModel ->
+        viewModel.user.observe(this, Observer { userModel ->
             Log.e("UserModel", userModel.toString())
             FCMService.Companion.setToken()
-                .addOnCompleteListener(object : OnCompleteListener<String?>() {
-                    fun onComplete(task: Task<String?>) {
+                .addOnCompleteListener(object : OnCompleteListener<String> {
+                    override fun onComplete(task: Task<String>) {
                         if (task.isSuccessful()) {
-                            userModel.setToken(task.getResult())
+                            userModel.token = (task.getResult())
                             viewModel.updateUser(userModel)
                         }
                     }
@@ -53,8 +75,8 @@ class HomeActivity : PermissionActivity() {
             )
         })
         binding.navView.setNavigationItemSelectedListener(object :
-            OnNavigationItemSelectedListener() {
-            fun onNavigationItemSelected(item: MenuItem): Boolean {
+            NavigationView.OnNavigationItemSelectedListener {
+            override fun onNavigationItemSelected(item: MenuItem): Boolean {
                 val fragment: Fragment
                 when (item.itemId) {
                     R.id.account -> fragment = AccountFragment()
@@ -67,7 +89,6 @@ class HomeActivity : PermissionActivity() {
                     R.id.help -> fragment = HelpFragment()
                     else -> fragment = AboutUsFragment()
                 }
-                Log.e("Fragment", fragment.getClass().getName())
                 replaceFragment(item.title.toString(), fragment)
                 binding.drawerLayout.closeDrawer(GravityCompat.START)
                 return true
@@ -75,7 +96,7 @@ class HomeActivity : PermissionActivity() {
         })
     }
 
-    fun onCreateOptionsMenu(menu: Menu?): Boolean {
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         getMenuInflater().inflate(R.menu.home_menu, menu)
         return true
     }
@@ -83,15 +104,11 @@ class HomeActivity : PermissionActivity() {
     /*
     For each menu a specific action is performed and based on that the item.isChecked value is changed
     */
-    fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         if (item.itemId == R.id.signout) {
-            var dataIsEmpty =
-                viewModel.getUser().getValue().getName() == null || "" == viewModel.getUser()
-                    .getValue().getName()
-            dataIsEmpty = dataIsEmpty || viewModel.getUser().getValue()
-                .getPhoneNumber() == null || "" == viewModel.getUser().getValue().getPhoneNumber()
-            dataIsEmpty = dataIsEmpty || viewModel.getUser().getValue()
-                .getPassword() == null || "" == viewModel.getUser().getValue().getPassword()
+            val dataIsEmpty = with(viewModel.user.value) {
+                this?.name.isNullOrEmpty() || this?.phoneNumber.isNullOrEmpty() || this?.password.isNullOrEmpty()
+            }
             if (dataIsEmpty) {
                 replaceFragment("Account", AccountFragment())
             } else {
@@ -102,11 +119,11 @@ class HomeActivity : PermissionActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    protected fun onStart() {
+    override fun onStart() {
         super.onStart()
-        viewModel.getUser().observe(this, Observer<Any?> { userModel ->
-            navHeadBinding.navHeaderName.setText(userModel.getName())
-            navHeadBinding.navHeaderEmail.setText(userModel.getEmail())
+        viewModel.user.observe(this, Observer { userModel ->
+            navHeadBinding.navHeaderName.setText(userModel.name)
+            navHeadBinding.navHeaderEmail.setText(userModel.name)
         })
     }
 
@@ -131,8 +148,8 @@ class HomeActivity : PermissionActivity() {
     private fun addFragment(title: String, fragment: Fragment) {
         Log.e("Fragment", "Added")
         binding.homeAppBarMain.toolbar.setTitle(title)
-        getSupportActionBar().setTitle(title)
-        getSupportFragmentManager()
+        supportActionBar?.setTitle(title)
+        supportFragmentManager
             .beginTransaction()
             .add(R.id.nav_host_fragment, fragment)
             .commit()
@@ -141,15 +158,15 @@ class HomeActivity : PermissionActivity() {
     private fun replaceFragment(title: String, fragment: Fragment) {
         Log.e("Fragment", "Replaced")
         binding.homeAppBarMain.toolbar.setTitle(title)
-        getSupportActionBar().setTitle(title)
-        getSupportFragmentManager()
+        supportActionBar?.setTitle(title)
+        supportFragmentManager
             .beginTransaction()
             .replace(R.id.nav_host_fragment, fragment)
             .commit()
     }
 
-    fun onBackPressed() {
-        if (!getSupportActionBar().getTitle().equals("Places")) addFragment(
+    override fun onBackPressed() {
+        if (supportActionBar?.title?.equals("Places") == true) addFragment(
             "Places",
             PlacesFragment()
         ) else super.onBackPressed()
