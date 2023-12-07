@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group>
+        <item
+            android:id="@+id/account"
+            android:icon="@drawable/man"
+            android:title="@string/account" />
+        <item
+            android:id="@+id/favorite"
+            android:icon="@drawable/img_favorite_place"
+            android:title="@string/favorite" />
+        <item
+            android:id="@+id/maps"
+            android:icon="@drawable/img_map"
+            android:title="@string/map" />
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/places"
+            android:icon="@drawable/img_place"
+            android:title="@string/places" />
+        <item
+            android:id="@+id/hotels"
+            android:icon="@drawable/img_hotel"
+            android:title="@string/hotels" />
+        <item
+            android:id="@+id/restaurants"
+            android:icon="@drawable/img_restaurant"
+            android:title="@string/restaurants" />
+        <item
+            android:id="@+id/events"
+            android:icon="@drawable/img_event"
+            android:title="@string/events" />
+    </group>
+
+    <group>
+        <item
+            android:id="@+id/help"
+            android:icon="@drawable/img_help"
+            android:title="Help" />
+        <item
+            android:icon="@drawable/img_about"
+            android:title="About Us" />
+    </group>
+
+</menu>

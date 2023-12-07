@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <data>
+
+        <!--        <import type="com.horux.visito.models.dao.UserModel" />-->
+        <!--        <variable-->
+        <!--            name="user"-->
+        <!--            type="com.horux.visito.models.dao.UserModel" />-->
+    </data>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@android:color/transparent"
+        android:fillViewport="true"
+        android:orientation="vertical"
+        android:scrollbars="vertical"
+        tools:context="com.horux.visito.fragments.AccountFragment">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@android:color/transparent"
+            android:gravity="center">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/account_logo"
+                android:layout_width="200dp"
+                android:layout_height="200dp"
+                android:layout_centerHorizontal="true"
+                android:scaleType="fitXY"
+                android:src="@drawable/man" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/email_address"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/account_logo"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/png_email_background"
+                android:drawableEnd="@drawable/ic_email"
+                android:inputType="text|textCapWords"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/light_grey" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/full_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/email_address"
+                android:layout_alignStart="@id/email_address"
+                android:layout_alignEnd="@id/email_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/png_email_background"
+                android:drawableEnd="@drawable/ic_person"
+                android:drawableTint="@color/black"
+                android:hint="@string/full_name"
+                android:inputType="textCapWords"
+                android:maxLength="50"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/light_grey" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/phone_number"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/full_name"
+                android:layout_alignStart="@id/email_address"
+                android:layout_alignEnd="@id/email_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/png_email_background"
+                android:drawableEnd="@drawable/ic_phone"
+                android:hint="@string/phone_number"
+                android:inputType="number"
+                android:maxLength="11"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/light_grey" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/phone_number_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/phone_number"
+                android:layout_alignStart="@id/email_address"
+                android:layout_alignEnd="@id/email_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_toStartOf="@id/email_address"
+                android:paddingStart="16dp"
+                android:text=""
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatEditText
+                android:id="@+id/password"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/phone_number_error"
+                android:layout_alignStart="@id/email_address"
+                android:layout_alignEnd="@id/email_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/png_email_background"
+                android:drawableEnd="@drawable/ic_eye"
+                android:hint="@string/password"
+                android:inputType="textVisiblePassword"
+                android:maxLength="16"
+                android:padding="16dp"
+                android:textColor="@color/black"
+                android:textColorHint="@color/light_grey" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/password_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/password"
+                android:layout_alignStart="@id/email_address"
+                android:layout_alignEnd="@id/email_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:layout_toStartOf="@id/email_address"
+                android:paddingStart="16dp"
+                android:text=""
+                android:textColor="@color/red"
+                android:textSize="16sp"
+                android:visibility="gone" />
+
+            <androidx.appcompat.widget.AppCompatButton
+                android:id="@+id/btnSaveProfile"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/password_error"
+                android:layout_alignStart="@id/email_address"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/png_login_button"
+                android:padding="10dp"
+                android:text="@string/save_profile"
+                android:textColor="@color/white"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+        </RelativeLayout>
+
+    </ScrollView>
+</layout>

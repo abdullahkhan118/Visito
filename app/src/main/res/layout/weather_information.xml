@@ -1,0 +1,346 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <data>
+
+    </data>
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginHorizontal="16dp"
+        app:cardBackgroundColor="@color/white"
+        app:cardCornerRadius="16dp"
+        app:cardElevation="10dp"
+        app:contentPadding="16dp">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="400dp">
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/temperatureImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/temperature"
+                app:layout_constraintBottom_toTopOf="@id/temperature"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintLeft_toLeftOf="parent"
+                app:layout_constraintRight_toLeftOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/feelsLikeImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/temperature"
+                app:layout_constraintBottom_toTopOf="@id/temperature"
+                app:layout_constraintHorizontal_weight="1"
+                app:layout_constraintLeft_toRightOf="@id/temperatureImage"
+                app:layout_constraintRight_toLeftOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/changeTemperatureImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/temperature"
+                app:layout_constraintBottom_toTopOf="@id/temperature"
+                app:layout_constraintHorizontal_weight="1.3"
+                app:layout_constraintLeft_toRightOf="@id/feelsLikeImage"
+                app:layout_constraintRight_toRightOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/temperature"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Temperature"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/humidityImage"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/temperatureImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/feelsLike"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="feelsLike"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/humidityImage"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@+id/feelsLikeImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/changeTemperature"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Change Temperature"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/humidityImage"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintHorizontal_bias="0.5"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@+id/changeTemperatureImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/humidityImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/humidity"
+                app:layout_constraintBottom_toTopOf="@id/humidity"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/feelsLike"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/pressureImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/pressure"
+                app:layout_constraintBottom_toTopOf="@id/humidity"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@id/feelsLike"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/precipitationImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/precipitation"
+                app:layout_constraintBottom_toTopOf="@id/humidity"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@id/feelsLike"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/humidity"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Humidity\n"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/windSpeedImage"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/humidityImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/pressure"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Pressure\n"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/windSpeedImage"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@+id/pressureImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/precipitation"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Precipitation\n"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/windSpeedImage"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintHorizontal_weight="1.5"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@+id/precipitationImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/windSpeedImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/wind"
+                app:layout_constraintBottom_toTopOf="@id/windSpeed"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/humidity"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/windDirectionImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/direction"
+                app:layout_constraintBottom_toTopOf="@id/windSpeed"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@id/humidity"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/windAngleImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/angle"
+                app:layout_constraintBottom_toTopOf="@id/windSpeed"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@id/humidity"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/windSpeed"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:maxLines="2"
+                android:text="Wind\nSpeed"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@id/uvImage"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/windSpeedImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/windDirection"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:maxLines="2"
+                android:text="Wind\nDirection"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/uvImage"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@+id/windDirectionImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/windAngle"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:maxLines="2"
+                android:text="Wind\nAngle"
+                android:textAlignment="center"
+                android:textColor="#5F6FCF"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toTopOf="@+id/uvImage"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@+id/windAngleImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/uvImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/uv"
+                app:layout_constraintBottom_toTopOf="@id/uv"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/windSpeed"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/cloudImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/cloud"
+                app:layout_constraintBottom_toTopOf="@id/cloud"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@+id/windSpeed"
+                app:layout_constraintVertical_weight="1" />
+
+
+            <androidx.appcompat.widget.AppCompatImageView
+                android:id="@+id/visibilityImage"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:src="@drawable/visibility"
+                app:layout_constraintBottom_toTopOf="@id/visibility"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@+id/windSpeed"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/uv"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Ultra\nViolet"
+                android:textAlignment="center"
+                android:textColor="#3B4791"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/temperatureImage"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/uvImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/cloud"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Cloud\n"
+                android:textAlignment="center"
+                android:textColor="#3B4791"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/feelsLikeImage"
+                app:layout_constraintStart_toStartOf="@id/feelsLikeImage"
+                app:layout_constraintTop_toBottomOf="@+id/cloudImage"
+                app:layout_constraintVertical_weight="1" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/visibility"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:text="Visual\n"
+                android:textAlignment="center"
+                android:textColor="#3B4791"
+                android:textSize="16sp"
+                android:textStyle="bold|italic"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="@id/changeTemperatureImage"
+                app:layout_constraintStart_toStartOf="@id/changeTemperatureImage"
+                app:layout_constraintTop_toBottomOf="@+id/visibilityImage"
+                app:layout_constraintVertical_weight="1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+</layout>

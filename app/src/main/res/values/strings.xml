@@ -1,0 +1,75 @@
+<resources>
+
+
+    <!-- menu strings -->
+
+    <string name="map_key" translatable="false">AIzaSyAh3zroRpxDYSvA1uCsAydiH0OB4K7TUUQ</string>
+    <string name="app_name">Visito</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="favorite">Favorite</string>
+    <string name="account">Account</string>
+    <string name="places">Places</string>
+    <string name="hotels">Hotels</string>
+    <string name="restaurants">Restaurants</string>
+    <string name="events">Events</string>
+    <string name="title_activity_home">HomeActivity</string>
+    <string name="nav_header_desc">Navigation header</string>
+
+    <string name="map">Map</string>
+    <string name="sign_out">Sign out</string>
+    <string name="nearby_places">Nearby Places</string>
+    <string name="places_are_not_available">Places are not available</string>
+    <string name="login">Login</string>
+    <string name="please_login_to_your_account">Please login to your account.</string>
+    <string name="password">Password</string>
+    <string name="email_address">Email@visito.com</string>
+    <string name="forgot_password">Forgot Password?</string>
+    <string name="please_signup_to_your_account">Please SignUp to your account.</string>
+    <string name="signup">SignUp</string>
+    <string name="full_name">Full Name</string>
+    <string name="default_email">abdullahkhan1@visito.com</string>
+    <string name="default_password">xcalibur</string>
+    <string name="phone_number">Phone Number</string>
+    <string name="popular_places">Popular Places</string>
+    <string name="popular_restaurants">Popular Restaurants</string>
+    <string name="nearby_restaurants">Nearby Restaurants</string>
+    <string name="nearby_hotels">Nearby Hotels</string>
+    <string name="popular_hotels">Popular Hotels</string>
+    <string name="title_activity_map">MapActivity</string>
+    <string name="title_activity_signup">SignUpActivity</string>
+    <string name="title_activity_signin">SignUpActivity</string>
+    <string name="description">Description</string>
+    <string name="send_email">Send Email</string>
+    <string name="save_profile">Save Profile</string>
+    <string name="current_events">Current Events</string>
+    <string name="all_events">All Events</string>
+    <!--    <string name="default_web_client_id">738854997363-b6d1tha01p0nrd9o6iddckob1hjtjbmj.apps.googleusercontent.com</string>-->
+
+    <integer name="span_count">1</integer>
+
+    <string-array name="categories">
+        <item>Hotel/Motel</item>
+        <item>Restaurant</item>
+        <item>Hospital</item>
+        <item>Park</item>
+        <item>Museum</item>
+        <item>-</item>
+    </string-array>
+
+    <string-array name="radius">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+        <item>6</item>
+        <item>7</item>
+        <item>8</item>
+        <item>9</item>
+        <item>10</item>
+    </string-array>
+
+    <string name="facebook_app_id">1032028687380653</string>
+    <string name="about_us_info">Visito is a android based application which provides many features to the tourist under one roof. A user can visit their favourite places and attend current events in the city by using our services. From choosing destination to visit that destination, all the things on one touch. \n\nOur goal is to provides services outside the karachi also and promote tourism through mobile App. \n\nFor any query contact us at the given email address. \n\nfypvisito@gmail.com</string>
+
+</resources>
