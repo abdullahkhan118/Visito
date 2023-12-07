@@ -35,9 +35,9 @@ class SignUpRepository private constructor() {
                         val userModel = UserModel(
                             id,
                             email,
-                            fullName,
+                            fullName ?: "",
                             password,
-                            phoneNumber,
+                            phoneNumber ?: "",
                             ""
                         )
                         firebaseFirestore

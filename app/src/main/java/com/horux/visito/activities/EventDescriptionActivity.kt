@@ -45,7 +45,7 @@ class EventDescriptionActivity : PermissionActivity() {
                 binding.pAddress.setText("Address: " + event.address!!.replace("\n", ""))
                 loadImage(this@EventDescriptionActivity,event.image,binding.pImage)
                 startLocationUpdates()
-                val locationObserver: Observer<*> = object : Observer<Location> {
+                val locationObserver = object : Observer<Location> {
                     override fun onChanged(location: Location) {
                         viewModel.location.setValue(location)
                         val eventLatLng = LatLng(event.latitude, event.longitude)

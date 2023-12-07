@@ -75,7 +75,7 @@ class PlacesFragment : Fragment() {
 
     private fun getNearBy(placeModels: ArrayList<PlaceModel>): ArrayList<PlaceModel> {
         val nearbyPlaces: ArrayList<PlaceModel> = ArrayList<PlaceModel>()
-        val currentLocation: Location = homeActivity.fusedLocation.currentLocation.getValue()
+        val currentLocation: Location? = homeActivity.fusedLocation.currentLocation.getValue()
         if (currentLocation != null) {
             val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
             for (placeModel in placeModels) {

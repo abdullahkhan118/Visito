@@ -1,6 +1,6 @@
 package com.horux.visito.adapters
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,7 +10,7 @@ import com.horux.visito.R
 import com.horux.visito.databinding.AddressItemBinding
 import com.horux.visito.models.tomtom.autocomplete.Result
 
-class AddressAdapter(var activity: Activity, list: ArrayList<Result>) : ArrayAdapter<Result>(
+class AddressAdapter(var activity: AppCompatActivity, list: ArrayList<Result>) : ArrayAdapter<Result>(
     activity, 0, list
 ) {
     @JvmField

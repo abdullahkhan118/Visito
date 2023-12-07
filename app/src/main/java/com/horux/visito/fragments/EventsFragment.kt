@@ -78,7 +78,7 @@ class EventsFragment : Fragment() {
 
     private fun getCurrentEvents(eventModels: ArrayList<EventModel>): ArrayList<EventModel> {
         val currentEvents: ArrayList<EventModel> = ArrayList<EventModel>()
-        val currentLocation: Location = homeActivity.fusedLocation.currentLocation.getValue()
+        val currentLocation: Location? = homeActivity.fusedLocation.currentLocation.getValue()
         if (currentLocation != null) {
             val currentLatLng = LatLng(currentLocation.latitude, currentLocation.longitude)
             for (eventModel in eventModels) {

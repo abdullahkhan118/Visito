@@ -63,10 +63,10 @@ class SignInRepository private constructor() {
                         val id: String = task.getResult().getUser()!!.getUid()
                         val userModel = UserModel(
                             id,
-                            UserGlobals.user!!.getEmail(),
-                            if (UserGlobals.user!!.getDisplayName() != null) UserGlobals.user!!.getDisplayName() else "",
+                            UserGlobals.user?.email ?: "",
+                            UserGlobals.user?.displayName ?: "",
                             "",
-                            if (UserGlobals.user!!.getPhoneNumber() != null) UserGlobals.user!!.getPhoneNumber() else "",
+                            UserGlobals.user?.phoneNumber ?: "",
                             ""
                         )
                         firebaseFirestore
@@ -77,7 +77,7 @@ class SignInRepository private constructor() {
                                 override fun onComplete(taskVoid: Task<Void>) {
                                     Log.e(
                                         "GoogleUser",
-                                        task.isSuccessful().toString() +" " + task.isCanceled()
+                                        task.isSuccessful().toString() + " " + task.isCanceled()
                                     )
                                     if (!task.isSuccessful() || task.isCanceled()) {
                                         response.setValue(null)
@@ -103,10 +103,10 @@ class SignInRepository private constructor() {
                         val id: String = task.getResult().getUser()!!.getUid()
                         val userModel = UserModel(
                             id,
-                            UserGlobals.user!!.getEmail(),
-                            if (UserGlobals.user!!.getDisplayName() != null) UserGlobals.user!!.getDisplayName() else "",
+                            UserGlobals.user?.email ?: "",
+                            UserGlobals.user?.displayName ?: "",
                             "",
-                            if (UserGlobals.user!!.getPhoneNumber() != null) UserGlobals.user!!.getPhoneNumber() else "",
+                            UserGlobals.user?.phoneNumber ?: "",
                             ""
                         )
                         firebaseFirestore

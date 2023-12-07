@@ -1,7 +1,7 @@
 package com.horux.visito.operations.ui_operations
 
-import android.app.Activity
-import android.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.app.AlertDialog
 import android.view.LayoutInflater
 import androidx.databinding.DataBindingUtil
 import com.horux.visito.R
@@ -11,7 +11,7 @@ import com.horux.visito.models.weather.CurrentWeatherResponse
 
 class DialogPrompt {
     fun showMessage(
-        activity: Activity,
+        activity: AppCompatActivity,
         inflater: LayoutInflater,
         message: String?
     ): MessagePromptBinding {
@@ -26,7 +26,7 @@ class DialogPrompt {
     }
 
     fun showWeather(
-        activity: Activity,
+        activity: AppCompatActivity,
         inflater: LayoutInflater,
         weather: CurrentWeatherResponse
     ): WeatherInformationBinding {

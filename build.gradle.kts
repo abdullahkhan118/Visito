@@ -7,9 +7,6 @@ buildscript {
     repositories {
         google()
         mavenCentral()
-//        maven {
-//            url = "https://maven.tomtom.com:8443/nexus/content/repositories/releases/"
-//        }
     }
     dependencies {
         classpath ("com.android.tools.build:gradle:4.2.2")
@@ -21,9 +18,3 @@ buildscript {
     }
 }
 
-//allprojects {
-//    repositories {
-//        google()
-//        mavenCentral()
-//    }
-//}

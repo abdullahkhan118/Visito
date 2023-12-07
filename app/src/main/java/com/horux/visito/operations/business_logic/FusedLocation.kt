@@ -1,7 +1,7 @@
 package com.horux.visito.operations.business_logic
 
 import android.Manifest
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.content.Context
 import android.content.IntentSender
 import android.content.pm.PackageManager
@@ -51,7 +51,7 @@ class FusedLocation private constructor() {
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(context)
     }
 
-    fun getLastLocation(activity: Activity) {
+    fun getLastLocation(activity: AppCompatActivity) {
         createClient(activity.baseContext)
         if (ActivityCompat.checkSelfPermission(
                 activity,
@@ -74,7 +74,7 @@ class FusedLocation private constructor() {
             })
     }
 
-    fun startLocationUpdates(activity: Activity) {
+    fun startLocationUpdates(activity: AppCompatActivity) {
         createClient(activity.baseContext)
         task = LocationServices.getSettingsClient(activity)
             .checkLocationSettings(LocationSettingsRequest.Builder().addLocationRequest(request).build())

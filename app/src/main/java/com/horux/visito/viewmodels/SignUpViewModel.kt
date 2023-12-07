@@ -1,6 +1,6 @@
 package com.horux.visito.viewmodels
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
@@ -24,7 +24,7 @@ class SignUpViewModel : ViewModel() {
         return response
     }
 
-    fun checkValidations(activity: Activity?): Boolean {
+    fun checkValidations(activity: AppCompatActivity?): Boolean {
         return true
     }
 }

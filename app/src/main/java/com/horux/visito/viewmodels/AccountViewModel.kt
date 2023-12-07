@@ -22,7 +22,7 @@ class AccountViewModel : ViewModel() {
         Log.e("UpdatedPhoneNumber", phoneNumber!!)
         userModel = UserModel(
             userModel!!.id,
-            email,
+            email ?: "",
             name,
             password,
             phoneNumber,

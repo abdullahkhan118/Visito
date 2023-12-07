@@ -1,6 +1,6 @@
 package com.horux.visito.adapters
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -9,8 +9,6 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.horux.visito.R
 import com.horux.visito.activities.PlaceDescriptionActivity
 import com.horux.visito.databinding.PlacesRowBinding
@@ -20,7 +18,7 @@ import com.horux.visito.models.dao.PlaceModel
 import java.util.Objects
 
 class PlacesAdapter(
-    private val activity: Activity,
+    private val activity: AppCompatActivity,
     inflater: LayoutInflater,
     list: ArrayList<PlaceModel>
 ) : RecyclerView.Adapter<PlacesAdapter.PlacesViewHolder?>() {
@@ -54,9 +52,6 @@ class PlacesAdapter(
             activity.startActivity(intent)
         })
     }
-
-    val itemCount: Int
-        get() = list.size
 
     fun updateList(updatedList: ArrayList<PlaceModel>) {
         list = updatedList

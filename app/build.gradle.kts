@@ -16,9 +16,6 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
-        vectorDrawables {
-            useSupportLibrary = true
-        }
     }
 
     buildFeatures {
@@ -57,7 +54,7 @@ android {
 dependencies {
 
     implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.1")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.2")
     implementation("androidx.activity:activity-compose:1.7.0")
     implementation(platform("androidx.compose:compose-bom:2023.08.00"))
     implementation("androidx.compose.ui:ui")
@@ -90,7 +87,7 @@ dependencies {
     implementation ("com.squareup.okhttp3:okhttp:3.14.9")
 
     //Multidex
-    implementation("androidx.multidex:multidex:2.0.1")
+//    implementation("androidx.multidex:multidex:2.0.1")
 
     //LiveDataAdapter
 //    implementation "me.linshen.retrofit2:adapter-livedata:1.0.0"
@@ -124,9 +121,6 @@ dependencies {
     implementation ("com.google.android.gms:play-services-maps:18.2.0")
     implementation ("com.google.android.gms:play-services-location:21.0.1")
     implementation ("com.google.maps.android:android-maps-utils:2.0.1")
-
-    //uber
-    implementation ("com.uber.sdk:rides-android:0.5.3")
 
     // CircularImage
     implementation ("de.hdodenhof:circleimageview:3.1.0")

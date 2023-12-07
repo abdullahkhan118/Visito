@@ -1,7 +1,6 @@
 package com.horux.visito.fragments
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
 import android.content.pm.PackageManager
 import android.hardware.Sensor
@@ -43,8 +42,6 @@ import com.horux.visito.operations.ui_operations.DialogPrompt
 import com.horux.visito.viewmodels.MapViewModel
 import java.util.Arrays
 import java.util.Locale
-import java.util.function.Predicate
-import java.util.stream.Collectors
 
 class MapsFragment : Fragment(), SensorEventListener {
     var mAzimuth = 0
@@ -166,7 +163,7 @@ class MapsFragment : Fragment(), SensorEventListener {
                 this@MapsFragment.googleMap = googleMap
                 setMapUi()
                 cameraPositionBuilder = CameraPosition.Builder()
-                val location: Location = permissionActivity.fusedLocation.currentLocation.getValue()
+                val location: Location? = permissionActivity.fusedLocation.currentLocation.getValue()
                 val latLngBoundsBuilder: LatLngBounds.Builder = LatLngBounds.Builder()
                 if (location != null) {
                     val currentPosition = LatLng(location.latitude, location.longitude)
@@ -309,7 +306,7 @@ class MapsFragment : Fragment(), SensorEventListener {
                 DialogPrompt().showWeather(
                     permissionActivity,
                     getLayoutInflater(),
-                    viewModel.weather.getValue()
+                    viewModel.weather.getValue()!!
                 )
             }
         })

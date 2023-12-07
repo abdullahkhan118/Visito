@@ -20,9 +20,9 @@ class ApiRepository private constructor() {
             val currentWeatherResponse: MutableLiveData<CurrentWeatherResponse> =
                 MutableLiveData<CurrentWeatherResponse>()
             WebConstants.retrofitWeatherInstance
-                .create(WebServices::class.java)
-                .fetchWeather("Karachi")
-                .enqueue(object : Callback<CurrentWeatherResponse?> {
+                ?.create(WebServices::class.java)
+                ?.fetchWeather("Karachi")
+                ?.enqueue(object : Callback<CurrentWeatherResponse?> {
                     override fun onResponse(
                         call: Call<CurrentWeatherResponse?>?,
                         response: Response<CurrentWeatherResponse?>
@@ -50,9 +50,9 @@ class ApiRepository private constructor() {
         val autoCompleteResponse: MutableLiveData<AutoCompleteResponse> =
             MutableLiveData<AutoCompleteResponse>()
         WebConstants.retrofitTomTomInstance
-            .create(WebServices::class.java)
-            .fetchAutoComplete(autoComplete, radiusInKM * 1000, lat, lon)
-            .enqueue(object : Callback<AutoCompleteResponse?> {
+            ?.create(WebServices::class.java)
+            ?.fetchAutoComplete(autoComplete, radiusInKM * 1000, lat, lon)
+            ?.enqueue(object : Callback<AutoCompleteResponse?> {
                 override fun onResponse(
                     call: Call<AutoCompleteResponse?>?,
                     response: Response<AutoCompleteResponse?>
@@ -75,9 +75,9 @@ class ApiRepository private constructor() {
     fun fetchCategories(): MutableLiveData<ArrayList<String>> {
         val categories: MutableLiveData<ArrayList<String>> = MutableLiveData<ArrayList<String>>()
         WebConstants.retrofitTomTomInstance
-            .create(WebServices::class.java)
-            .fetchCategories()
-            .enqueue(object : Callback<CategoryResponse?> {
+            ?.create(WebServices::class.java)
+            ?.fetchCategories()
+            ?.enqueue(object : Callback<CategoryResponse?> {
                 override fun onResponse(
                     call: Call<CategoryResponse?>?,
                     response: Response<CategoryResponse?>
@@ -103,9 +103,9 @@ class ApiRepository private constructor() {
             (("${sourceLatLng.latitude} , ${sourceLatLng.longitude}").toString() + ":" + destinationLatLng.latitude).toString() + "," + destinationLatLng.longitude
         val routeResponse: MutableLiveData<RouteResponse> = MutableLiveData<RouteResponse>()
         WebConstants.retrofitTomTomInstance
-            .create(WebServices::class.java)
-            .fetchRoute(locations)
-            .enqueue(object : Callback<RouteResponse?> {
+            ?.create(WebServices::class.java)
+            ?.fetchRoute(locations)
+            ?.enqueue(object : Callback<RouteResponse?> {
                 override fun onResponse(call: Call<RouteResponse?>?, response: Response<RouteResponse?>) {
                     Log.e("onResponse", "Route: " + response.toString())
                     val json: String = Gson().toJson(response.body())

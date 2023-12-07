@@ -20,6 +20,31 @@ import com.horux.visito.models.dao.PlaceModel
 
 class HomeRepository private constructor() {
     var user: MutableLiveData<UserModel> = MutableLiveData<UserModel>()
+        get() {
+            val id: String = firebaseAuth.getCurrentUser()!!.getUid()
+            firebaseFirestore
+                .collection(AppConstants.STRING_USERS)
+                .whereEqualTo("id", id)
+                .get()
+                .addOnCompleteListener(object : OnCompleteListener<QuerySnapshot?> {
+                    override fun onComplete(task: Task<QuerySnapshot?>) {
+                        Log.e("GetUser", "Task successful: " + task.isSuccessful())
+                        if (task.isSuccessful()) {
+                            Log.e(
+                                "GetUser",
+                                "Task documents: " + task.getResult()!!.getDocuments().isEmpty()
+                            )
+                            if (!task.getResult()!!.getDocuments().isEmpty()) {
+                                field.setValue(
+                                    task.getResult()!!.getDocuments().get(0)
+                                        .toObject(UserModel::class.java)
+                                )
+                            }
+                        }
+                    }
+                })
+            return field
+        }
     private val firebaseAuth: FirebaseAuth
     private val firebaseFirestore: FirebaseFirestore
     private val firebaseDatabase: FirebaseDatabase
@@ -28,32 +53,6 @@ class HomeRepository private constructor() {
         firebaseAuth = FirebaseAuth.getInstance()
         firebaseFirestore = FirebaseFirestore.getInstance()
         firebaseDatabase = FirebaseDatabase.getInstance()
-    }
-
-    fun getUser(): MutableLiveData<UserModel> {
-        val id: String = firebaseAuth.getCurrentUser()!!.getUid()
-        firebaseFirestore
-            .collection(AppConstants.STRING_USERS)
-            .whereEqualTo("id", id)
-            .get()
-            .addOnCompleteListener(object : OnCompleteListener<QuerySnapshot?> {
-                override fun onComplete(task: Task<QuerySnapshot?>) {
-                    Log.e("GetUser", "Task successful: " + task.isSuccessful())
-                    if (task.isSuccessful()) {
-                        Log.e(
-                            "GetUser",
-                            "Task documents: " + task.getResult()!!.getDocuments().isEmpty()
-                        )
-                        if (!task.getResult()!!.getDocuments().isEmpty()) {
-                            user.setValue(
-                                task.getResult()!!.getDocuments().get(0)
-                                    .toObject(UserModel::class.java)
-                            )
-                        }
-                    }
-                }
-            })
-        return user
     }
 
     fun updateUser(userModel: UserModel): MutableLiveData<UserModel> {

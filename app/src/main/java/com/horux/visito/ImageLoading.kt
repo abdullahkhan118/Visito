@@ -1,11 +1,11 @@
 package com.horux.visito
 
-import android.app.Activity
+import androidx.appcompat.app.AppCompatActivity
 import android.widget.ImageView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 
-fun loadImage(activity: Activity,imageUrl: String, imageView: ImageView) {
+fun loadImage(activity: AppCompatActivity, imageUrl: String, imageView: ImageView) {
     val options: RequestOptions = RequestOptions()
         .fitCenter()
         .placeholder(R.drawable.img_loading)

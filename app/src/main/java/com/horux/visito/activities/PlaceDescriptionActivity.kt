@@ -83,8 +83,8 @@ class PlaceDescriptionActivity : PermissionActivity() {
                     } else binding.cardContact.setVisibility(View.GONE)
                     loadImage(this@PlaceDescriptionActivity, image, binding.pImage)
                     startLocationUpdates()
-                    val locationObserver: Observer<*> = object : Observer<Location> {
-                        override fun onChanged(location: Location) {
+                    val locationObserver =
+                        Observer<Location> { location ->
                             viewModel.location.setValue(location)
                             val placeLatLng = LatLng(latitude, longitude)
                             if (viewModel.getDistance().getValue() == null) {
@@ -104,7 +104,6 @@ class PlaceDescriptionActivity : PermissionActivity() {
                                         })
                             }
                         }
-                    }
                 fusedLocation.currentLocation.observe(
                     this@PlaceDescriptionActivity,
                     locationObserver

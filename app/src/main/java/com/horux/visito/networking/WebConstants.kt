@@ -1,5 +1,6 @@
 package com.horux.visito.networking
 
+import com.android.installreferrer.BuildConfig.APPLICATION_ID
 import com.google.gson.Gson
 import okhttp3.OkHttpClient
 import retrofit2.Retrofit
@@ -123,5 +124,5 @@ object WebConstants {
         java.security.cert.CertificateException::class
     )
     val certificate: SelfSignedCertificate
-        get() = SelfSignedCertificate(com.horux.visito.BuildConfig.APPLICATION_ID)
+        get() = SelfSignedCertificate(APPLICATION_ID)
 }
